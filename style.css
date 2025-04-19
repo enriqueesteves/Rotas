@@ -1,0 +1,133 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+
+#map {
+  height: 100vh;
+  width: 100%;
+  z-index: 1;
+}
+
+#telaInicial, #loginMoto, #formCliente {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1000;
+}
+
+#telaInicial button,
+#loginMoto button,
+#formCliente button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background-color: #00c853;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#telaInicial button:hover,
+#loginMoto button:hover,
+#formCliente button:hover {
+  background-color: #009624;
+}
+
+input, select {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+}
+
+.oculto {
+  display: none;
+}
+
+#cancelarViagem {
+  position: absolute;
+  bottom: 100px;
+  right: 20px;
+  z-index: 1000;
+  padding: 15px 20px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+#cancelarViagem:hover {
+  background: #d32f2f;
+}
+
+#chatContainer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+  padding: 10px;
+}
+
+#chatBox {
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  color: black;
+}
+
+#chatInput {
+  width: 75%;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+#enviarMsg {
+  width: 20%;
+  padding: 10px;
+  margin-left: 5%;
+  border: none;
+  background-color: #2196f3;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#enviarMsg:hover {
+  background-color: #1976d2;
+}
+
+@media (max-width: 600px) {
+  #chatContainer {
+    flex-direction: column;
+  }
+
+  #chatInput,
+  #enviarMsg {
+    width: 100%;
+    margin: 5px 0;
+  }
+}
