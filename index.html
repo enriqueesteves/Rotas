@@ -29,6 +29,11 @@
   <div id="infoCorrida" class="painel-info hidden"></div>
 
   <div id="chatBox" class="chat hidden">
+    <div class="chat-header">
+      <h3>Chat</h3>
+      <button class="chat-close-btn" onclick="fecharChat()">X</button>
+      <button class="chat-back-btn" onclick="voltarParaMapa()">Voltar</button>
+    </div>
     <div id="chatMensagens"></div>
     <input id="mensagem" placeholder="Digite uma mensagem" />
     <button onclick="enviarMensagem()">Enviar</button>
