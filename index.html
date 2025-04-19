@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Localização Moto Táxi</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"/>
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+
+    #buttons {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #buttons button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 200px;
+    }
+
+    #buscarMoto {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 1000;
+      display: none;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="buttons">
+    <button id="btnMoto">Sou Moto Táxi</button>
+    <button id="btnCliente">Sou Cliente</button>
+  </div>
+
+  <button id="buscarMoto">Buscar Moto Táxi</button>
+
+  <div id="map"></div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+  <!-- Firebase config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBaUW_ih2lxM9DRftochEBQUczXSPDx7vg",
+      authDomain: "banco-40005.firebaseapp.com",
+      databaseURL: "https://banco-40005-default-rtdb.firebaseio.com",
+      projectId: "banco-40005",
+      storageBucket: "banco-40005.firebasestorage.app",
+      messagingSenderId: "979660568413",
+      appId: "1:979660568413:web:24e2510d5f840d45121ab4",
+      measurementId: "G-TDHZS843JH"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <!-- Script principal -->
+  <script src="script.js"></script>
+
+</body>
+</html>
