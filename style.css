@@ -145,6 +145,37 @@ button, select, input {
   border: 1px solid #ddd; /* Adicionar uma borda sutil */
 }
 
+.chat-header {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.chat-close-btn, .chat-back-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px;
+  margin-left: 5px;
+}
+
+.chat-close-btn {
+  color: #dc3545;
+}
+
+.chat-back-btn {
+  color: #007bff;
+}
+
 #chatMensagens {
   flex: 1;
   padding: 15px; /* Aumentar o padding */
@@ -183,7 +214,25 @@ button, select, input {
   background-color: #0056b3;
 }
 
+.solicitacao-marker-container {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  padding: 5px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+.solicitacao-marker-container span {
+  font-size: 24px;
+  display: block;
+}
+
+.solicitacao-marker-container small {
+  font-size: 12px;
+  color: #333;
+}
+
 .solicitacao-marker {
-  font-size: 30px !important; /* Tornar o ícone ainda maior */
+  font-size: 24px; /* Tamanho do ícone dentro do container (pode ser ajustado) */
   cursor: pointer;
 }
