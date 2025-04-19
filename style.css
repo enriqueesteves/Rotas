@@ -4,11 +4,17 @@ Body, html {
   height: 100%;
   font-family: 'Arial', sans-serif;
   overflow: hidden; /* Para evitar barras de rolagem indesejadas */
+  font-size: 16px; /* Aumentar o tamanho da fonte base */
 }
 
 #map {
   height: 100%;
   width: 100%;
+}
+
+button, select, input {
+  font-size: 16px !important; /* Aumentar o tamanho da fonte nos controles */
+  padding: 10px !important; /* Aumentar o padding nos controles */
 }
 
 .painel-login {
@@ -26,7 +32,7 @@ Body, html {
 
 .painel-login button {
   width: 80%; /* Reduzir a largura para dar mais espaço */
-  padding: 12px; /* Aumentar o padding dos botões */
+  padding: 15px; /* Aumentar o padding dos botões de login */
   margin: 10px 0; /* Aumentar a margem para separação */
   background-color: #00c851;
   color: #fff;
@@ -34,7 +40,7 @@ Body, html {
   border-radius: 8px; /* Bordas mais arredondadas */
   font-weight: bold;
   cursor: pointer;
-  font-size: 16px; /* Aumentar o tamanho da fonte */
+  font-size: 18px; /* Aumentar o tamanho da fonte dos botões de login */
   transition: background-color 0.3s ease; /* Adicionar uma transição suave */
 }
 
@@ -48,7 +54,7 @@ Body, html {
   left: 50%; /* Centralizar horizontalmente */
   transform: translate(-50%, -50%); /* Ajuste fino para centralização */
   background: white;
-  padding: 25px; /* Aumentar o padding */
+  padding: 30px; /* Aumentar o padding do modal */
   z-index: 999;
   border-radius: 10px;
   width: 300px; /* Aumentar a largura para mais espaço */
@@ -60,6 +66,7 @@ Body, html {
   margin-top: 0;
   margin-bottom: 15px;
   color: #333;
+  font-size: 20px; /* Aumentar o tamanho da fonte do título do modal */
 }
 
 .modal select,
@@ -155,14 +162,14 @@ Body, html {
 }
 
 #mensagem {
-  padding: 12px; /* Aumentar o padding */
+  padding: 15px; /* Aumentar o padding na entrada de mensagem */
   border: none;
   width: calc(100% - 80px); /* Ajustar a largura com o botão */
   font-size: 16px;
 }
 
 .chat button {
-  padding: 12px; /* Aumentar o padding */
+  padding: 15px; /* Aumentar o padding do botão de enviar mensagem */
   border: none;
   background: #007bff;
   color: white;
@@ -177,6 +184,6 @@ Body, html {
 }
 
 .solicitacao-marker {
-  font-size: 24px; /* Tornar o ícone maior */
+  font-size: 30px !important; /* Tornar o ícone ainda maior */
   cursor: pointer;
-  }
+}
