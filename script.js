@@ -10,7 +10,8 @@ const firebaseConfig = {
   measurementId: "G-TDHZS843JH"
 };
 
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(
+  firebaseConfig);
 const db = firebase.database();
 
 let map, userMarker, routingControl;
@@ -19,6 +20,7 @@ let usuarioId = null;
 let destinoSelecionado = null;
 let corridaAtiva = null;
 let solicitacoesAtivas = {}; // Para rastrear os marcadores de solicitação no mapa
+let chatRef = null; // Referência para o chat atual
 
 // Inicializar o mapa com um estilo mais moderno (OpenStreetMap CartoDB Voyager)
 map = L.map('map').setView([-15.8, -47.9], 13);
@@ -29,8 +31,9 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png', {
   detectRetina: true
 }).addTo(map);
 
-// Ocultar o formulário de cliente inicialmente
+// Ocultar o formulário de cliente inicialmente e o chat
 document.getElementById('clienteForm').style.display = 'none';
+document.getElementById('chatBox').classList.add('hidden');
 
 // Atualiza localização em tempo real
 function iniciarLocalizacao() {
@@ -142,8 +145,11 @@ function escutarSolicitacoes() {
   db.ref('corridas').on('child_added', snap => {
     const corrida = snap.val();
     if (corrida && corrida.status === 'pendente' && !solicitacoesAtivas[corrida.id]) {
+      const valorFormatado = `R$${corrida.valor}`;
+      const iconHtml = `<div class="solicitacao-marker"><span>${corrida.tipo === 'entrega' ? '📦' : '🛵'}</span><br><small>${valorFormatado}</small></div>`;
+
       const marker = L.marker([corrida.lat, corrida.lng], {
-        icon: L.divIcon({ className: 'solicitacao-marker', html: corrida.tipo === 'entrega' ? '📦' : '🛵' })
+        icon: L.divIcon({ className: 'solicitacao-marker-container', html: iconHtml })
       }).addTo(map);
 
       solicitacoesAtivas[corrida.id] = { marker: marker, corridaId: corrida.id, clienteId: corrida.clienteId };
@@ -165,93 +171,109 @@ function escutarSolicitacoes() {
     if (corrida && corrida.status === 'aceita' && solicitacoesAtivas[corrida.id] && corrida.mototaxiId !== usuarioId) {
       // Remove o marcador da solicitação que foi aceita por outro mototáxi
       if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
-        map.removeLayer(solicitacoesAtivas[corrida.
+        map.removeLayer(solicitacoesAtivas[corrida.id].marker);
+      }
+      delete solicitacoesAtivas[corrida.id];
+    } else if (corrida && corrida.status === 'cancelada' && solicitacoesAtivas[corrida.id]) {
+      // Remove o marcador da solicitação que foi cancelada
+      if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
+        map.removeLayer(solicitacoesAtivas[corrida.id].marker);
+      }
+      delete solicitacoesAtivas[corrida.id];
+    } else if (corrida && corrida.status === 'aceita' && corrida.mototaxiId === usuarioId && solicitacoesAtivas[corrida.id]) {
+      // Remove o marcador da solicitação aceita pelo próprio mototaxi
+      if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
+        map.removeLayer(solicitacoesAtivas[corrida.id].marker);
+      }
+      delete solicitacoesAtivas[corrida.id];
+      corridaAtiva = corrida.id;
+      iniciarRota([corrida.lat, corrida.lng]);
+      iniciarChat(corrida.clienteId, corrida.id);
+    }
+  });
 
+  // Escuta por corridas removidas (canceladas)
+  db.ref('corridas').on('child_removed', snap => {
+    const corridaIdRemovida = snap.key;
+    if (solicitacoesAtivas[corridaIdRemovida] && solicitacoesAtivas[corridaIdRemovida].marker) {
+      map.removeLayer(solicitacoesAtivas[corridaIdRemovida].marker);
+      delete solicitacoesAtivas[corridaIdRemovida];
+    }
+    if (corridaAtiva === corridaIdRemovida) {
+      corridaAtiva = null;
+      if (routingControl) {
+        map.removeControl(routingControl);
+        routingControl = null;
+      }
+      document.getElementById("chatBox").classList.add("hidden");
+      if (tipoUsuario === 'cliente') {
+        document.getElementById("infoCorrida").classList.add("hidden");
+      }
+      // Limpa a referência do chat ao encerrar a corrida
+      chatRef = null;
+    }
+  });
+}
 
+// Função para fechar o chat
+function fecharChat() {
+  document.getElementById("chatBox").classList.add("hidden");
+  // Opcional: Desativa o listener do chat ao fechar
+  if (chatRef) {
+    chatRef.off('child_added');
+    chatRef = null;
+  }
+}
 
-                        id].marker);
+// Função para voltar para o mapa (oculta o chat)
+function voltarParaMapa() {
+  document.getElementById("chatBox").classList.add("hidden");
 }
-delete solicitacoesAtivas[corrida.id];
-} else if (corrida && corrida.status === 'cancelada' && solicitacoesAtivas[corrida.id]) {
-// Remove o marcador da solicitação que foi cancelada
-if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
-map.removeLayer(solicitacoesAtivas[corrida.id].marker);
-}
-delete solicitacoesAtivas[corrida.id];
-} else if (corrida && corrida.status === 'aceita' && corrida.mototaxiId === usuarioId && solicitacoesAtivas[corrida.id]) {
-// Remove o marcador da solicitação aceita pelo próprio mototaxi
-if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
-map.removeLayer(solicitacoesAtivas[corrida.id].marker);
-}
-delete solicitacoesAtivas[corrida.id];
-corridaAtiva = corrida.id;
-iniciarRota([corrida.lat, corrida.lng]);
-iniciarChat(corrida.clienteId, corrida.id);
-document.getElementById("chatBox").classList.remove("hidden");
-}
-});
-// Escuta por corridas removidas (canceladas)
-db.ref('corridas').on('child_removed', snap => {
-const corridaIdRemovida = snap.key;
-if (solicitacoesAtivas[corridaIdRemovida] && solicitacoesAtivas[corridaIdRemovida].marker) {
-map.removeLayer(solicitacoesAtivas[corridaIdRemovida].marker);
-delete solicitacoesAtivas[corridaIdRemovida];
-}
-if (corridaAtiva === corridaIdRemovida) {
-corridaAtiva = null;
-if (routingControl) {
-map.removeControl(routingControl);
-routingControl = null;
-}
-document.getElementById("chatBox").classList.add("hidden");
-if (tipoUsuario === 'cliente') {
-document.getElementById("infoCorrida").classList.add("hidden");
-}
-}
-});
-}
+
 // Função para iniciar o chat com o cliente ao clicar no marcador
 function iniciarChatComCliente(clienteId, corridaId) {
-iniciarChat(clienteId, corridaId);
-document.getElementById("chatBox").classList.remove("hidden");
-// Opcional: Aqui você pode adicionar lógica para marcar a corrida como "em contato" ou algo similar
-// db.ref(corridas/${corridaId}).update({ status: 'em_contato' });
+  iniciarChat(clienteId, corridaId);
 }
+
+// Função para iniciar o chat
+function iniciarChat(destinatarioId, corridaId) {
+  const chatMensagensDiv = document.getElementById("chatMensagens");
+  chatMensagensDiv.innerHTML = ''; // Limpa mensagens antigas
+
+  chatRef = db.ref(`chats/${corridaId}`);
+  chatRef.on('child_added', snap => {
+    const msg = snap.val();
+    const el = document.createElement("div");
+    el.textContent = `${msg.user === usuarioId ? 'Você' : destinatarioId.startsWith('cliente_') ? 'Cliente' : 'Moto Táxi'}: ${msg.texto}`;
+    chatMensagensDiv.appendChild(el);
+    chatMensagensDiv.scrollTop = chatMensagensDiv.scrollHeight;
+  });
+
+  document.getElementById("chatBox").classList.remove("hidden");
+
+  window.enviarMensagem = () => {
+    const input = document.getElementById("mensagem");
+    const texto = input.value.trim();
+    if (texto === "") return;
+    chatRef.push({
+      user: usuarioId,
+      texto
+    });
+    input.value = "";
+  };
+}
+
 // Rota entre motorista e cliente
 function iniciarRota(destino) {
-if (routingControl) map.removeControl(routingControl);
-routingControl = L.Routing.control({
-waypoints: [
-userMarker.getLatLng(),
-L.latLng(destino[0], destino[1])
-],
-routeWhileDragging: false,
-language: 'pt-BR', // Define o idioma para português
-showAlternatives: false, // Oculta rotas alternativas
-fitSelectedRoutes: true // Ajusta o mapa para exibir a rota
-}).addTo(map);
-}
-// Chat
-function iniciarChat(destinatarioId, corridaId) {
-const chatRef = db.ref(chats/${corridaId});
-const chatMensagensDiv = document.getElementById("chatMensagens");
-chatMensagensDiv.innerHTML = ''; // Limpa mensagens antigas
-chatRef.on('child_added', snap => {
-const msg = snap.val();
-const el = document.createElement("div");
-el.textContent = ${msg.user === usuarioId ? 'Você' : destinatarioId.startsWith('cliente_') ? 'Cliente' : 'Moto Táxi'}: ${msg.texto};
-chatMensagensDiv.appendChild(el);
-chatMensagensDiv.scrollTop = chatMensagensDiv.scrollHeight;
-});
-document.getElementById("chatBox").classList.remove("hidden");
-window.enviarMensagem = () => {
-const input = document.getElementById("mensagem");
-const texto = input.value.trim();
-if (texto === "") return;
-chatRef.push({
-user: usuarioId,
-texto
-});
-input.value = "";
-};
-}
+  if (routingControl) map.removeControl(routingControl);
+  routingControl = L.Routing.control({
+    waypoints: [
+      userMarker.getLatLng(),
+      L.latLng(destino[0], destino[1])
+    ],
+    routeWhileDragging: false,
+    language: 'pt-BR', // Define o idioma para português
+    showAlternatives: false, // Oculta rotas alternativas
+    fitSelectedRoutes: true // Ajusta o mapa para exibir a rota
+  }).addTo(map);
+    }
