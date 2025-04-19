@@ -165,98 +165,93 @@ function escutarSolicitacoes() {
     if (corrida && corrida.status === 'aceita' && solicitacoesAtivas[corrida.id] && corrida.mototaxiId !== usuarioId) {
       // Remove o marcador da solicitação que foi aceita por outro mototáxi
       if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
-        map.removeLayer(solicitacoesAtivas[corrida.id].marker);
-      }
-      delete solicitacoesAtivas[corrida.id];
-    } else if (corrida && corrida.status === 'cancelada' && solicitacoesAtivas[corrida.id]) {
-      // Remove o marcador da solicitação que foi cancelada
-      if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
-        map.removeLayer(solicitacoesAtivas[corrida.id].marker);
-      }
-      delete solicitacoes
+        map.removeLayer(solicitacoesAtivas[corrida.
 
-            solicitacoesAtivas[corrida.id];
-    } else if (corrida && corrida.status === 'aceita' && corrida.mototaxiId === usuarioId && solicitacoesAtivas[corrida.id]) {
-      // Remove o marcador da solicitação aceita pelo próprio mototaxi
-      if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
-        map.removeLayer(solicitacoesAtivas[corrida.id].marker);
-      }
-      delete solicitacoesAtivas[corrida.id];
-      corridaAtiva = corrida.id;
-      iniciarRota([corrida.lat, corrida.lng]);
-      iniciarChat(corrida.clienteId, corrida.id);
-      document.getElementById("chatBox").classList.remove("hidden");
-    }
-  });
 
-  // Escuta por corridas removidas (canceladas)
-  db.ref('corridas').on('child_removed', snap => {
-    const corridaIdRemovida = snap.key;
-    if (solicitacoesAtivas[corridaIdRemovida] && solicitacoesAtivas[corridaIdRemovida].marker) {
-      map.removeLayer(solicitacoesAtivas[corridaIdRemovida].marker);
-      delete solicitacoesAtivas[corridaIdRemovida];
-    }
-    if (corridaAtiva === corridaIdRemovida) {
-      corridaAtiva = null;
-      if (routingControl) {
-        map.removeControl(routingControl);
-        routingControl = null;
-      }
-      document.getElementById("chatBox").classList.add("hidden");
-      if (tipoUsuario === 'cliente') {
-        document.getElementById("infoCorrida").classList.add("hidden");
-      }
-    }
-  });
+
+                        id].marker);
 }
-
+delete solicitacoesAtivas[corrida.id];
+} else if (corrida && corrida.status === 'cancelada' && solicitacoesAtivas[corrida.id]) {
+// Remove o marcador da solicitação que foi cancelada
+if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
+map.removeLayer(solicitacoesAtivas[corrida.id].marker);
+}
+delete solicitacoesAtivas[corrida.id];
+} else if (corrida && corrida.status === 'aceita' && corrida.mototaxiId === usuarioId && solicitacoesAtivas[corrida.id]) {
+// Remove o marcador da solicitação aceita pelo próprio mototaxi
+if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
+map.removeLayer(solicitacoesAtivas[corrida.id].marker);
+}
+delete solicitacoesAtivas[corrida.id];
+corridaAtiva = corrida.id;
+iniciarRota([corrida.lat, corrida.lng]);
+iniciarChat(corrida.clienteId, corrida.id);
+document.getElementById("chatBox").classList.remove("hidden");
+}
+});
+// Escuta por corridas removidas (canceladas)
+db.ref('corridas').on('child_removed', snap => {
+const corridaIdRemovida = snap.key;
+if (solicitacoesAtivas[corridaIdRemovida] && solicitacoesAtivas[corridaIdRemovida].marker) {
+map.removeLayer(solicitacoesAtivas[corridaIdRemovida].marker);
+delete solicitacoesAtivas[corridaIdRemovida];
+}
+if (corridaAtiva === corridaIdRemovida) {
+corridaAtiva = null;
+if (routingControl) {
+map.removeControl(routingControl);
+routingControl = null;
+}
+document.getElementById("chatBox").classList.add("hidden");
+if (tipoUsuario === 'cliente') {
+document.getElementById("infoCorrida").classList.add("hidden");
+}
+}
+});
+}
 // Função para iniciar o chat com o cliente ao clicar no marcador
 function iniciarChatComCliente(clienteId, corridaId) {
-  iniciarChat(clienteId, corridaId);
-  document.getElementById("chatBox").classList.remove("hidden");
-  // Opcional: Aqui você pode adicionar lógica para marcar a corrida como "em contato" ou algo similar
-  // db.ref(`corridas/${corridaId}`).update({ status: 'em_contato' });
+iniciarChat(clienteId, corridaId);
+document.getElementById("chatBox").classList.remove("hidden");
+// Opcional: Aqui você pode adicionar lógica para marcar a corrida como "em contato" ou algo similar
+// db.ref(corridas/${corridaId}).update({ status: 'em_contato' });
 }
-
 // Rota entre motorista e cliente
 function iniciarRota(destino) {
-  if (routingControl) map.removeControl(routingControl);
-  routingControl = L.Routing.control({
-    waypoints: [
-      userMarker.getLatLng(),
-      L.latLng(destino[0], destino[1])
-    ],
-    routeWhileDragging: false,
-    language: 'pt-BR', // Define o idioma para português
-    showAlternatives: false, // Oculta rotas alternativas
-    fitSelectedRoutes: true // Ajusta o mapa para exibir a rota
-  }).addTo(map);
+if (routingControl) map.removeControl(routingControl);
+routingControl = L.Routing.control({
+waypoints: [
+userMarker.getLatLng(),
+L.latLng(destino[0], destino[1])
+],
+routeWhileDragging: false,
+language: 'pt-BR', // Define o idioma para português
+showAlternatives: false, // Oculta rotas alternativas
+fitSelectedRoutes: true // Ajusta o mapa para exibir a rota
+}).addTo(map);
 }
-
 // Chat
 function iniciarChat(destinatarioId, corridaId) {
-  const chatRef = db.ref(`chats/${corridaId}`);
-  const chatMensagensDiv = document.getElementById("chatMensagens");
-  chatMensagensDiv.innerHTML = ''; // Limpa mensagens antigas
-
-  chatRef.on('child_added', snap => {
-    const msg = snap.val();
-    const el = document.createElement("div");
-    el.textContent = `${msg.user === usuarioId ? 'Você' : destinatarioId.startsWith('cliente_') ? 'Cliente' : 'Moto Táxi'}: ${msg.texto}`;
-    chatMensagensDiv.appendChild(el);
-    chatMensagensDiv.scrollTop = chatMensagensDiv.scrollHeight;
-  });
-
-  document.getElementById("chatBox").classList.remove("hidden");
-
-  window.enviarMensagem = () => {
-    const input = document.getElementById("mensagem");
-    const texto = input.value.trim();
-    if (texto === "") return;
-    chatRef.push({
-      user: usuarioId,
-      texto
-    });
-    input.value = "";
-  };
-      }
+const chatRef = db.ref(chats/${corridaId});
+const chatMensagensDiv = document.getElementById("chatMensagens");
+chatMensagensDiv.innerHTML = ''; // Limpa mensagens antigas
+chatRef.on('child_added', snap => {
+const msg = snap.val();
+const el = document.createElement("div");
+el.textContent = ${msg.user === usuarioId ? 'Você' : destinatarioId.startsWith('cliente_') ? 'Cliente' : 'Moto Táxi'}: ${msg.texto};
+chatMensagensDiv.appendChild(el);
+chatMensagensDiv.scrollTop = chatMensagensDiv.scrollHeight;
+});
+document.getElementById("chatBox").classList.remove("hidden");
+window.enviarMensagem = () => {
+const input = document.getElementById("mensagem");
+const texto = input.value.trim();
+if (texto === "") return;
+chatRef.push({
+user: usuarioId,
+texto
+});
+input.value = "";
+};
+}
