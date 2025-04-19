@@ -1,60 +1,43 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sistema Moto Táxi</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="style.css" />
+  <title>Mototáxi App</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
 </head>
 <body>
-  <div id="telaInicial">
-    <button id="btnCliente">Entrar como Cliente</button>
-    <button id="btnMoto">Entrar como Moto Táxi</button>
+  <div id="map"></div>
+
+  <div class="painel-login" id="loginPanel">
+    <button onclick="entrarComoCliente()">Entrar como Cliente</button>
+    <button onclick="entrarComoMotoTaxi()">Entrar como Moto Táxi</button>
   </div>
 
-  <div id="loginMoto" class="oculto">
-    <input type="password" id="senhaMoto" placeholder="Senha" />
-    <button id="entrarMoto">Entrar</button>
-  </div>
-
-  <div id="formCliente" class="oculto">
-    <select id="tipoServico">
+  <div id="clienteForm" class="modal hidden">
+    <h3>Nova Solicitação</h3>
+    <select id="tipoCorrida">
       <option value="viagem">Viagem</option>
       <option value="entrega">Entrega</option>
     </select>
-    <input type="number" id="valorDesejado" placeholder="Valor desejado" />
-    <button id="enviarSolicitacao">Solicitar</button>
+    <input type="number" id="valor" placeholder="Valor desejado" />
+    <button onclick="enviarSolicitacao()">Confirmar</button>
   </div>
 
-  <div id="map"></div>
+  <div id="infoCorrida" class="painel-info hidden"></div>
 
-  <button id="cancelarViagem" class="oculto">Cancelar Viagem</button>
-
-  <div id="chatContainer" class="oculto">
-    <div id="chatBox"></div>
-    <input type="text" id="chatInput" placeholder="Mensagem..." />
-    <button id="enviarMsg">Enviar</button>
+  <div id="chatBox" class="chat hidden">
+    <div id="chatMensagens"></div>
+    <input id="mensagem" placeholder="Digite uma mensagem" />
+    <button onclick="enviarMensagem()">Enviar</button>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBaUW_ih2lxM9DRftochEBQUczXSPDx7vg",
-      authDomain: "banco-40005.firebaseapp.com",
-      databaseURL: "https://banco-40005-default-rtdb.firebaseio.com",
-      projectId: "banco-40005",
-      storageBucket: "banco-40005.firebasestorage.app",
-      messagingSenderId: "979660568413",
-      appId: "1:979660568413:web:24e2510d5f840d45121ab4",
-      measurementId: "G-TDHZS843JH"
-    };
-    firebase.initializeApp(firebaseConfig);
-  </script>
   <script src="script.js"></script>
 </body>
 </html>
