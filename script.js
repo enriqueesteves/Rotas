@@ -1,279 +1,46 @@
-// Configuração Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBaUW_ih2lxM9DRftochEBQUczXSPDx7vg",
-  authDomain: "banco-40005.firebaseapp.com",
-  databaseURL: "https://banco-40005-default-rtdb.firebaseio.com",
-  projectId: "banco-40005",
-  storageBucket: "banco-40005.firebasestorage.app",
-  messagingSenderId: "979660568413",
-  appId: "1:979660568413:web:24e2510d5f840d45121ab4",
-  measurementId: "G-TDHZS843JH"
-};
+// script.js
 
-firebase.initializeApp(
-  firebaseConfig);
-const db = firebase.database();
+// Configuração do Firebase const firebaseConfig = { apiKey: "AIzaSyBaUW_ih2lxM9DRftochEBQUczXSPDx7vg", authDomain: "banco-40005.firebaseapp.com", databaseURL: "https://banco-40005-default-rtdb.firebaseio.com", projectId: "banco-40005", storageBucket: "banco-40005.appspot.com", messagingSenderId: "979660568413", appId: "1:979660568413:web:24e2510d5f840d45121ab4" }; firebase.initializeApp(firebaseConfig); const db = firebase.database();
 
-let map, userMarker, routingControl;
-let tipoUsuario = null;
-let usuarioId = null;
-let destinoSelecionado = null;
-let corridaAtiva = null;
-let solicitacoesAtivas = {}; // Para rastrear os marcadores de solicitação no mapa
-let chatRef = null; // Referência para o chat atual
+// API do Geoapify const GEOAPIFY_API_KEY = "7de2193e48404eb7aa0af1222a8d7bc4";
 
-// Inicializar o mapa com um estilo mais moderno (OpenStreetMap CartoDB Voyager)
-map = L.map('map').setView([-15.8, -47.9], 13);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  subdomains: 'abcd',
-  maxZoom: 20,
-  detectRetina: true
-}).addTo(map);
+let map = L.map('map').setView([-23.55052, -46.633308], 13); L.tileLayer(https://maps.geoapify.com/v1/tile/dark-matter/{z}/{x}/{y}.png?apiKey=${GEOAPIFY_API_KEY}, { attribution: 'Powered by Geoapify', maxZoom: 20 }).addTo(map);
 
-// Ocultar o formulário de cliente inicialmente e o chat
-document.getElementById('clienteForm').style.display = 'none';
-document.getElementById('chatBox').classList.add('hidden');
+let markers = {}; let userType = null; let userId = null;
 
-// Atualiza localização em tempo real
-function iniciarLocalizacao() {
-  if (navigator.geolocation) {
-    navigator.geolocation.watchPosition(pos => {
-      const { latitude, longitude } = pos.coords;
-      const latLng = [latitude, longitude];
-      if (!userMarker) {
-        userMarker = L.marker(latLng, { draggable: false }).addTo(map);
-        map.setView(latLng, 15);
-      } else {
-        userMarker.setLatLng(latLng);
-      }
+// Obter localização em tempo real function startTracking() { if (navigator.geolocation) { navigator.geolocation.watchPosition(position => { const { latitude, longitude } = position.coords; if (!userId) userId = db.ref(userType).push().key; db.ref(${userType}/${userId}).set({ latitude, longitude }); }); } else { alert("Geolocalização não suportada"); } }
 
-      firebase.database().ref(`usuarios/${usuarioId}`).update({
-        lat: latitude,
-        lng: longitude,
-        tipo: tipoUsuario
-      });
+// Atualizar marcadores no mapa function updateMap() { db.ref().on('value', snapshot => { const data = snapshot.val(); Object.keys(markers).forEach(key => map.removeLayer(markers[key])); markers = {};
 
-      if (tipoUsuario === 'mototaxi') {
-        escutarSolicitacoes();
-      }
-    }, (error) => {
-      console.error("Erro ao obter a localização:", error);
-      alert("Não foi possível obter sua localização. Verifique as permissões do seu navegador.");
-    });
-  } else {
-    alert("Geolocalização não suportada pelo seu navegador!");
+for (let type in data) {
+  for (let id in data[type]) {
+    const { latitude, longitude, tipo, valor } = data[type][id];
+    const color = tipo === 'Entrega' ? 'blue' : tipo === 'Viagem' ? 'green' : 'red';
+    const marker = L.circleMarker([latitude, longitude], {
+      radius: 10,
+      color
+    }).addTo(map);
+
+    if (tipo && valor) {
+      marker.bindPopup(`<b>${tipo}</b><br>Valor: R$${valor}`);
+    }
+    marker.on('click', () => openChat(id));
+    markers[id] = marker;
   }
 }
 
-// Entrar como cliente
-function entrarComoCliente() {
-  tipoUsuario = 'cliente';
-  usuarioId = 'cliente_' + Date.now();
-  document.getElementById('loginPanel').style.display = 'none';
-  document.getElementById('clienteForm').style.display = 'block';
-  iniciarLocalizacao();
-}
+}); }
 
-// Entrar como mototáxi
-function entrarComoMotoTaxi() {
-  const senha = prompt("Digite a senha do mototáxi:");
-  if (senha === '1234') {
-    tipoUsuario = 'mototaxi';
-    usuarioId = 'mototaxi_' + Date.now();
-    document.getElementById('loginPanel').style.display = 'none';
-    iniciarLocalizacao();
-  } else {
-    alert("Senha incorreta!");
-  }
-}
+// Cliente envia solicitação function enviarSolicitacao() { const tipo = document.getElementById('tipoServico').value; const valor = document.getElementById('valorDesejado').value; if (!userId) userId = db.ref('clientes').push().key;
 
-// Enviar solicitação
-function enviarSolicitacao() {
-  const tipo = document.getElementById("tipoCorrida").value;
-  const valor = document.getElementById("valor").value;
+navigator.geolocation.getCurrentPosition(position => { const { latitude, longitude } = position.coords; db.ref(clientes/${userId}).set({ tipo, valor, latitude, longitude }); }); }
 
-  if (!userMarker) return alert("Localização não disponível");
+// Abrir chat function openChat(clienteId) { const chatContainer = document.getElementById('chatContainer'); chatContainer.style.display = 'block'; document.getElementById('chat').innerHTML = '';
 
-  const pos = userMarker.getLatLng();
-  const id = Date.now();
-  db.ref(`corridas/${id}`).set({
-    id,
-    clienteId: usuarioId,
-    tipo,
-    valor,
-    lat: pos.lat,
-    lng: pos.lng,
-    status: 'pendente'
-  });
+const chatRef = db.ref(chats/${clienteId}); chatRef.on('value', snapshot => { const mensagens = snapshot.val(); document.getElementById('chat').innerHTML = ''; for (let msg in mensagens) { const { texto, remetente } = mensagens[msg]; const div = document.createElement('div'); div.textContent = ${remetente}: ${texto}; document.getElementById('chat').appendChild(div); } });
 
-  document.getElementById("clienteForm").style.display = 'none';
-  document.getElementById("infoCorrida").classList.remove("hidden");
-  document.getElementById("infoCorrida").innerHTML = `
-    Aguardando mototáxi... <br>Tipo: ${tipo} <br>Valor: R$ ${valor} <br>
-    <button onclick="cancelarCorrida('${id}')">Cancelar</button>
-  `;
+document.getElementById('enviarMensagem').onclick = () => { const texto = document.getElementById('mensagem').value; db.ref(chats/${clienteId}).push({ texto, remetente: userType }); document.getElementById('mensagem').value = ''; }; }
 
-  corridaAtiva = id;
-  // O bug de não remover o marcador de solicitação ao cancelar será corrigido na função cancelarCorrida
-}
+// Botões de entrada function iniciar(tipo) { userType = tipo; startTracking(); updateMap(); if (tipo === 'clientes') { document.getElementById('formularioCliente').style.display = 'block'; } document.getElementById('entrada').style.display = 'none'; }
 
-// Cancelar corrida
-function cancelarCorrida(id) {
-  db.ref(`corridas/${id}`).remove()
-    .then(() => {
-      document.getElementById("infoCorrida").classList.add("hidden");
-      document.getElementById("chatBox").classList.add("hidden");
-      corridaAtiva = null;
-      // Remove o marcador de solicitação do mapa, se existir
-      for (const key in solicitacoesAtivas) {
-        if (solicitacoesAtivas[key].corridaId === id) {
-          map.removeLayer(solicitacoesAtivas[key].marker);
-          delete solicitacoesAtivas[key];
-          break;
-        }
-      }
-    })
-    .catch((error) => {
-      console.error("Erro ao cancelar a corrida:", error);
-      alert("Houve um erro ao cancelar a corrida.");
-    });
-}
-
-// Mototaxi escuta novas corridas
-function escutarSolicitacoes() {
-  db.ref('corridas').on('child_added', snap => {
-    const corrida = snap.val();
-    if (corrida && corrida.status === 'pendente' && !solicitacoesAtivas[corrida.id]) {
-      const valorFormatado = `R$${corrida.valor}`;
-      const iconHtml = `<div class="solicitacao-marker"><span>${corrida.tipo === 'entrega' ? '📦' : '🛵'}</span><br><small>${valorFormatado}</small></div>`;
-
-      const marker = L.marker([corrida.lat, corrida.lng], {
-        icon: L.divIcon({ className: 'solicitacao-marker-container', html: iconHtml })
-      }).addTo(map);
-
-      solicitacoesAtivas[corrida.id] = { marker: marker, corridaId: corrida.id, clienteId: corrida.clienteId };
-
-      marker.on('click', () => {
-        const popupContent = `
-          Tipo: ${corrida.tipo}<br>
-          Valor: R$${corrida.valor}<br>
-          <button onclick="iniciarChatComCliente('${corrida.clienteId}', '${corrida.id}')">Iniciar Chat</button>
-        `;
-        marker.bindPopup(popupContent).openPopup();
-      });
-    }
-  });
-
-  // Escuta por alterações no status das corridas (para remover marcadores de corridas aceitas por outros)
-  db.ref('corridas').on('child_changed', snap => {
-    const corrida = snap.val();
-    if (corrida && corrida.status === 'aceita' && solicitacoesAtivas[corrida.id] && corrida.mototaxiId !== usuarioId) {
-      // Remove o marcador da solicitação que foi aceita por outro mototáxi
-      if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
-        map.removeLayer(solicitacoesAtivas[corrida.id].marker);
-      }
-      delete solicitacoesAtivas[corrida.id];
-    } else if (corrida && corrida.status === 'cancelada' && solicitacoesAtivas[corrida.id]) {
-      // Remove o marcador da solicitação que foi cancelada
-      if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
-        map.removeLayer(solicitacoesAtivas[corrida.id].marker);
-      }
-      delete solicitacoesAtivas[corrida.id];
-    } else if (corrida && corrida.status === 'aceita' && corrida.mototaxiId === usuarioId && solicitacoesAtivas[corrida.id]) {
-      // Remove o marcador da solicitação aceita pelo próprio mototaxi
-      if (solicitacoesAtivas[corrida.id] && solicitacoesAtivas[corrida.id].marker) {
-        map.removeLayer(solicitacoesAtivas[corrida.id].marker);
-      }
-      delete solicitacoesAtivas[corrida.id];
-      corridaAtiva = corrida.id;
-      iniciarRota([corrida.lat, corrida.lng]);
-      iniciarChat(corrida.clienteId, corrida.id);
-    }
-  });
-
-  // Escuta por corridas removidas (canceladas)
-  db.ref('corridas').on('child_removed', snap => {
-    const corridaIdRemovida = snap.key;
-    if (solicitacoesAtivas[corridaIdRemovida] && solicitacoesAtivas[corridaIdRemovida].marker) {
-      map.removeLayer(solicitacoesAtivas[corridaIdRemovida].marker);
-      delete solicitacoesAtivas[corridaIdRemovida];
-    }
-    if (corridaAtiva === corridaIdRemovida) {
-      corridaAtiva = null;
-      if (routingControl) {
-        map.removeControl(routingControl);
-        routingControl = null;
-      }
-      document.getElementById("chatBox").classList.add("hidden");
-      if (tipoUsuario === 'cliente') {
-        document.getElementById("infoCorrida").classList.add("hidden");
-      }
-      // Limpa a referência do chat ao encerrar a corrida
-      chatRef = null;
-    }
-  });
-}
-
-// Função para fechar o chat
-function fecharChat() {
-  document.getElementById("chatBox").classList.add("hidden");
-  // Opcional: Desativa o listener do chat ao fechar
-  if (chatRef) {
-    chatRef.off('child_added');
-    chatRef = null;
-  }
-}
-
-// Função para voltar para o mapa (oculta o chat)
-function voltarParaMapa() {
-  document.getElementById("chatBox").classList.add("hidden");
-}
-
-// Função para iniciar o chat com o cliente ao clicar no marcador
-function iniciarChatComCliente(clienteId, corridaId) {
-  iniciarChat(clienteId, corridaId);
-}
-
-// Função para iniciar o chat
-function iniciarChat(destinatarioId, corridaId) {
-  const chatMensagensDiv = document.getElementById("chatMensagens");
-  chatMensagensDiv.innerHTML = ''; // Limpa mensagens antigas
-
-  chatRef = db.ref(`chats/${corridaId}`);
-  chatRef.on('child_added', snap => {
-    const msg = snap.val();
-    const el = document.createElement("div");
-    el.textContent = `${msg.user === usuarioId ? 'Você' : destinatarioId.startsWith('cliente_') ? 'Cliente' : 'Moto Táxi'}: ${msg.texto}`;
-    chatMensagensDiv.appendChild(el);
-    chatMensagensDiv.scrollTop = chatMensagensDiv.scrollHeight;
-  });
-
-  document.getElementById("chatBox").classList.remove("hidden");
-
-  window.enviarMensagem = () => {
-    const input = document.getElementById("mensagem");
-    const texto = input.value.trim();
-    if (texto === "") return;
-    chatRef.push({
-      user: usuarioId,
-      texto
-    });
-    input.value = "";
-  };
-}
-
-// Rota entre motorista e cliente
-function iniciarRota(destino) {
-  if (routingControl) map.removeControl(routingControl);
-  routingControl = L.Routing.control({
-    waypoints: [
-      userMarker.getLatLng(),
-      L.latLng(destino[0], destino[1])
-    ],
-    routeWhileDragging: false,
-    language: 'pt-BR', // Define o idioma para português
-    showAlternatives: false, // Oculta rotas alternativas
-    fitSelectedRoutes: true // Ajusta o mapa para exibir a rota
-  }).addTo(map);
-    }
+  
