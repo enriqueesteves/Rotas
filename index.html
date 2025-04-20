@@ -7,125 +7,112 @@
     <style>
         /* Estilos Globais */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Roboto', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #f0f8ff; /* Azul bem claro */
-            color: #333;
+            background-color: #f3f4f6;
+            color: #374151;
         }
         .container {
             background-color: #fff;
-            padding: 40px;
+            padding: 48px;
             border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
             width: 90%;
-            max-width: 600px;
+            max-width: 640px;
         }
         h1, h2 {
-            color: #2c3e50; /* Azul escuro */
-            margin-bottom: 20px;
+            color: #1e293b;
+            margin-bottom: 24px;
         }
         .hidden {
             display: none !important;
         }
         #mensagem-erro {
-            color: #e74c3c; /* Vermelho */
-            margin-top: 15px;
+            color: #dc2626;
+            margin-top: 16px;
             font-weight: bold;
         }
 
-        /* Estilos da Seleção de Usuário */
-        #selecao-usuario h2 {
-            margin-bottom: 30px;
-        }
-        #selecao-usuario button {
-            padding: 18px 40px;
+        /* Botões */
+        button {
+            padding: 16px 32px;
             font-size: 1.1em;
             cursor: pointer;
-            background-color: #3498db; /* Azul médio */
-            color: white;
             border: none;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin: 15px;
-            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        /* Botões de Seleção */
+        #selecao-usuario button {
+            background-color: #6366f1;
+            color: #fff;
+            margin: 16px;
         }
         #selecao-usuario button:hover {
-            background-color: #2980b9;
+            background-color: #4f46e5;
         }
 
-        /* Estilos da Área do Cliente */
+        /* Botão de Enviar Localização */
         #cliente-area button {
-            padding: 18px 40px;
-            font-size: 1.1em;
-            cursor: pointer;
-            background-color: #27ae60; /* Verde */
-            color: white;
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
+            background-color: #10b981;
+            color: #fff;
+            margin-top: 24px;
         }
         #cliente-area button:hover {
-            background-color: #219653;
-        }
-        #mapa-cliente {
-            width: 100%;
-            height: 350px;
-            margin-top: 25px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            background-color: #059669;
         }
 
-        /* Estilos da Área do Motorista */
-        #motorista-area h2 {
-            margin-bottom: 25px;
+        /* Botão de Entrar Motorista */
+        #motorista-area button {
+            background-color: #f97316;
+            color: #fff;
+            margin-top: 24px;
         }
+        #motorista-area button:hover {
+            background-color: #ea580c;
+        }
+
+        /* Input de Senha */
         #motorista-area input[type="password"] {
-            padding: 15px;
-            margin: 15px 0;
-            border: 1px solid #ccc;
+            padding: 12px 16px;
+            margin: 16px 0;
+            border: 1px solid #d1d5db;
             border-radius: 6px;
             width: 100%;
             box-sizing: border-box;
             font-size: 1em;
         }
-        #motorista-area button {
-            padding: 18px 40px;
-            font-size: 1.1em;
-            cursor: pointer;
-            background-color: #f39c12; /* Laranja */
-            color: white;
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
+        #motorista-area input[type="password"]:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
-        #motorista-area button:hover {
-            background-color: #e67e22;
-        }
-        #painel-motorista h2 {
-            margin-top: 0;
-            margin-bottom: 25px;
-        }
-        #mapa-motorista {
+
+        /* Mapas */
+        #mapa-cliente, #mapa-motorista {
             width: 100%;
             height: 400px;
-            margin-top: 25px;
-            border: 1px solid #ddd;
+            margin-top: 24px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div class="container" id="selecao-usuario">
@@ -135,7 +122,7 @@
     </div>
 
     <div class="container hidden" id="cliente-area">
-        <h1>Compartilhe sua Localização para o Motorista</h1>
+        <h1>Compartilhe sua Localização</h1>
         <button id="enviar-localizacao">Enviar Localização</button>
         <div id="mapa-cliente" class="hidden"></div>
     </div>
@@ -151,13 +138,6 @@
         </div>
     </div>
 
-    <div id="mapa" class="hidden"></div>
-
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
-    <link href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" rel="stylesheet" />
-
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyBaUW_ih2lxM9DRftochEBQUczXSPDx7vg",
@@ -172,24 +152,20 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Elementos da seleção de usuário
+        // Elementos da interface
         const selecaoUsuarioDiv = document.getElementById('selecao-usuario');
         const clienteBtn = document.getElementById('cliente-btn');
         const motoristaBtn = document.getElementById('motorista-btn');
-
-        // Elementos da área do cliente
         const clienteAreaDiv = document.getElementById('cliente-area');
         const enviarLocalizacaoBotao = document.getElementById('enviar-localizacao');
         const mapaClienteDiv = document.getElementById('mapa-cliente');
-        let mapaCliente;
-
-        // Elementos da área do motorista
         const motoristaAreaDiv = document.getElementById('motorista-area');
         const senhaInput = document.getElementById('senha');
         const entrarBotao = document.getElementById('entrar');
         const mensagemErro = document.getElementById('mensagem-erro');
         const painelMotoristaDiv = document.getElementById('painel-motorista');
         const mapaMotoristaDiv = document.getElementById('mapa-motorista');
+
         let mapaMotorista;
         let clienteMarker;
         let minhaLocalizacaoMarker;
@@ -212,15 +188,13 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
-
+                        const { latitude, longitude } = position.coords;
                         db.collection('localizacoes').add({
-                            latitude: latitude,
-                            longitude: longitude,
+                            latitude,
+                            longitude,
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         })
-                        .then((docRef) => {
+                        .then(() => {
                             alert('Localização enviada com sucesso!');
                             mapaClienteDiv.classList.remove('hidden');
                             initMapaCliente(latitude, longitude);
@@ -254,10 +228,7 @@
         entrarBotao.addEventListener('click', () => {
             const senhaDigitada = senhaInput.value;
             if (senhaDigitada === '123456') {
-                motoristaAreaDiv.querySelector('h2').style.display = 'none';
-                senhaInput.style.display = 'none';
-                entrarBotao.style.display = 'none';
-                mensagemErro.textContent = '';
+                motoristaAreaDiv.classList.add('hidden');
                 painelMotoristaDiv.classList.remove('hidden');
                 initMapaMotorista();
                 escutarLocalizacoes();
@@ -270,16 +241,14 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        const minhaLatitude = position.coords.latitude;
-                        const minhaLongitude = position.coords.longitude;
-
+                        const { latitude, longitude } = position.coords;
                         const map = new maplibregl.Map({
                             container: 'mapaMotoristaDiv',
                             style: `https://maps.geoapify.com/v1/styles/osm-bright/style.json?apiKey=${apiKeyGeoapify}`,
-                            center: [minhaLongitude, minhaLatitude],
+                            center: [longitude, latitude],
                             zoom: 15
                         });
-                        minhaLocalizacaoMarker = new maplibregl.Marker().setLngLat([minhaLongitude, minhaLatitude]).addTo(map);
+                        minhaLocalizacaoMarker = new maplibregl.Marker().setLngLat([longitude, latitude]).addTo(map);
                         mapaMotorista = map;
                     },
                     (error) => {
@@ -287,7 +256,7 @@
                         const map = new maplibregl.Map({
                             container: 'mapaMotoristaDiv',
                             style: `https://maps.geoapify.com/v1/styles/osm-bright/style.json?apiKey=${apiKeyGeoapify}`,
-                            center: [-46.6333, -23.5505], // São Paulo
+                            center: [-46.6333, -23.5505],
                             zoom: 12
                         });
                         mapaMotorista = map;
@@ -297,7 +266,7 @@
                 const map = new maplibregl.Map({
                     container: 'mapaMotoristaDiv',
                     style: `https://maps.geoapify.com/v1/styles/osm-bright/style.json?apiKey=${apiKeyGeoapify}`,
-                    center: [-46.6333, -23.5505], // São Paulo
+                    center: [-46.6333, -23.5505],
                     zoom: 12
                 });
                 mapaMotorista = map;
