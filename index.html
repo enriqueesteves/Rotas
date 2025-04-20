@@ -1,48 +1,332 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mototáxi App</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrega Fácil</title>
+    <style>
+        /* Estilos Globais */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff; /* Azul bem claro */
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 30px;
+            width: 90%;
+            max-width: 600px;
+        }
+        h1, h2 {
+            color: #2c3e50; /* Azul escuro */
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        #mensagem-erro {
+            color: #e74c3c; /* Vermelho */
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* Estilos da Seleção de Usuário */
+        #selecao-usuario h2 {
+            margin-bottom: 30px;
+        }
+        #selecao-usuario button {
+            padding: 18px 40px;
+            font-size: 1.1em;
+            cursor: pointer;
+            background-color: #3498db; /* Azul médio */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 15px;
+            transition: background-color 0.3s ease;
+        }
+        #selecao-usuario button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Estilos da Área do Cliente */
+        #cliente-area button {
+            padding: 18px 40px;
+            font-size: 1.1em;
+            cursor: pointer;
+            background-color: #27ae60; /* Verde */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        #cliente-area button:hover {
+            background-color: #219653;
+        }
+        #mapa-cliente {
+            width: 100%;
+            height: 350px;
+            margin-top: 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Estilos da Área do Motorista */
+        #motorista-area h2 {
+            margin-bottom: 25px;
+        }
+        #motorista-area input[type="password"] {
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        #motorista-area button {
+            padding: 18px 40px;
+            font-size: 1.1em;
+            cursor: pointer;
+            background-color: #f39c12; /* Laranja */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        #motorista-area button:hover {
+            background-color: #e67e22;
+        }
+        #painel-motorista h2 {
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+        #mapa-motorista {
+            width: 100%;
+            height: 400px;
+            margin-top: 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+    </style>
 </head>
 <body>
-  <div id="map"></div>
-
-  <div class="painel-login" id="loginPanel">
-    <button onclick="entrarComoCliente()">Entrar como Cliente</button>
-    <button onclick="entrarComoMotoTaxi()">Entrar como Moto Táxi</button>
-  </div>
-
-  <div id="clienteForm" class="modal hidden">
-    <h3>Nova Solicitação</h3>
-    <select id="tipoCorrida">
-      <option value="viagem">Viagem</option>
-      <option value="entrega">Entrega</option>
-    </select>
-    <input type="number" id="valor" placeholder="Valor desejado" />
-    <button onclick="enviarSolicitacao()">Confirmar</button>
-  </div>
-
-  <div id="infoCorrida" class="painel-info hidden"></div>
-
-  <div id="chatBox" class="chat hidden">
-    <div class="chat-header">
-      <h3>Chat</h3>
-      <button class="chat-close-btn" onclick="fecharChat()">X</button>
-      <button class="chat-back-btn" onclick="voltarParaMapa()">Voltar</button>
+    <div class="container" id="selecao-usuario">
+        <h2>Você é?</h2>
+        <button id="cliente-btn">Cliente</button>
+        <button id="motorista-btn">Motorista</button>
     </div>
-    <div id="chatMensagens"></div>
-    <input id="mensagem" placeholder="Digite uma mensagem" />
-    <button onclick="enviarMensagem()">Enviar</button>
-  </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
-  <script src="script.js"></script>
+    <div class="container hidden" id="cliente-area">
+        <h1>Compartilhe sua Localização para o Motorista</h1>
+        <button id="enviar-localizacao">Enviar Localização</button>
+        <div id="mapa-cliente" class="hidden"></div>
+    </div>
+
+    <div class="container hidden" id="motorista-area">
+        <h2>Login do Motorista</h2>
+        <input type="password" id="senha" placeholder="Senha">
+        <button id="entrar">Entrar</button>
+        <p id="mensagem-erro"></p>
+        <div id="painel-motorista" class="hidden">
+            <h2>Painel do Motorista</h2>
+            <div id="mapa-motorista"></div>
+        </div>
+    </div>
+
+    <div id="mapa" class="hidden"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyBaUW_ih2lxM9DRftochEBQUczXSPDx7vg",
+          authDomain: "banco-40005.firebaseapp.com",
+          projectId: "banco-40005",
+          storageBucket: "banco-40005.appspot.com",
+          messagingSenderId: "979660568413",
+          appId: "1:979660568413:web:24e2510d5f840d45121ab4",
+          measurementId: "G-TDHZS843JH"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Elementos da seleção de usuário
+        const selecaoUsuarioDiv = document.getElementById('selecao-usuario');
+        const clienteBtn = document.getElementById('cliente-btn');
+        const motoristaBtn = document.getElementById('motorista-btn');
+
+        // Elementos da área do cliente
+        const clienteAreaDiv = document.getElementById('cliente-area');
+        const enviarLocalizacaoBotao = document.getElementById('enviar-localizacao');
+        const mapaClienteDiv = document.getElementById('mapa-cliente');
+        let mapaCliente;
+
+        // Elementos da área do motorista
+        const motoristaAreaDiv = document.getElementById('motorista-area');
+        const senhaInput = document.getElementById('senha');
+        const entrarBotao = document.getElementById('entrar');
+        const mensagemErro = document.getElementById('mensagem-erro');
+        const painelMotoristaDiv = document.getElementById('painel-motorista');
+        const mapaMotoristaDiv = document.getElementById('mapa-motorista');
+        let mapaMotorista;
+        let clienteMarker;
+        let minhaLocalizacaoMarker;
+
+        // Lógica de seleção de usuário
+        clienteBtn.addEventListener('click', () => {
+            selecaoUsuarioDiv.classList.add('hidden');
+            clienteAreaDiv.classList.remove('hidden');
+        });
+
+        motoristaBtn.addEventListener('click', () => {
+            selecaoUsuarioDiv.classList.add('hidden');
+            motoristaAreaDiv.classList.remove('hidden');
+        });
+
+        // Lógica do cliente
+        enviarLocalizacaoBotao.addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        db.collection('localizacoes').add({
+                            latitude: latitude,
+                            longitude: longitude,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        })
+                        .then((docRef) => {
+                            alert('Localização enviada com sucesso!');
+                            mapaClienteDiv.classList.remove('hidden');
+                            initMapaCliente(latitude, longitude);
+                        })
+                        .catch((error) => {
+                            console.error('Erro ao enviar a localização: ', error);
+                            alert('Erro ao enviar a localização.');
+                        });
+                    },
+                    (error) => {
+                        alert('Erro ao obter a localização: ' + error.message);
+                    }
+                );
+            } else {
+                alert('Seu navegador não suporta geolocalização.');
+            }
+        });
+
+        function initMapaCliente(latitude, longitude) {
+            mapaCliente = new google.maps.Map(mapaClienteDiv, {
+                center: {lat: latitude, lng: longitude},
+                zoom: 15
+            });
+            new google.maps.Marker({
+                position: {lat: latitude, lng: longitude},
+                map: mapaCliente,
+                title: 'Sua Localização'
+            });
+        }
+
+        // Lógica do motorista
+        entrarBotao.addEventListener('click', () => {
+            const senhaDigitada = senhaInput.value;
+            if (senhaDigitada === '123456') {
+                motoristaAreaDiv.querySelector('h2').style.display = 'none';
+                senhaInput.style.display = 'none';
+                entrarBotao.style.display = 'none';
+                mensagemErro.textContent = '';
+                painelMotoristaDiv.classList.remove('hidden');
+                initMapaMotorista();
+                escutarLocalizacoes();
+            } else {
+                mensagemErro.textContent = 'Senha incorreta.';
+            }
+        });
+
+        function initMapaMotorista() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const minhaLatitude = position.coords.latitude;
+                        const minhaLongitude = position.coords.longitude;
+
+                        mapaMotorista = new google.maps.Map(mapaMotoristaDiv, {
+                            center: {lat: minhaLatitude, lng: minhaLongitude},
+                            zoom: 15
+                        });
+                        minhaLocalizacaoMarker = new google.maps.Marker({
+                            position: {lat: minhaLatitude, lng: minhaLongitude},
+                            map: mapaMotorista,
+                            title: 'Sua Localização'
+                        });
+                    },
+                    (error) => {
+                        console.error('Erro ao obter sua localização: ', error);
+                        mapaMotorista = new google.maps.Map(mapaMotoristaDiv, {
+                            center: {lat: -23.5505, lng: -46.6333},
+                            zoom: 12
+                        });
+                    }
+                );
+            } else {
+                mapaMotorista = new google.maps.Map(mapaMotoristaDiv, {
+                    center: {lat: -23.5505, lng: -46.6333},
+                    zoom: 12
+                });
+                alert('Seu navegador não suporta geolocalização.');
+            }
+        }
+
+        function escutarLocalizacoes() {
+            db.collection('localizacoes')
+                .orderBy('timestamp', 'desc')
+                .limit(1)
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const data = change.doc.data();
+                            atualizarMapaMotorista(data.latitude, data.longitude);
+                        }
+                    });
+                });
+        }
+
+        function atualizarMapaMotorista(latitudeCliente, longitudeCliente) {
+            if (mapaMotorista) {
+                const clienteLatLng = new google.maps.LatLng(latitudeCliente, longitudeCliente);
+                if (clienteMarker) {
+                    clienteMarker.setPosition(clienteLatLng);
+                } else {
+                    clienteMarker = new google.maps.Marker({
+                        position: clienteLatLng,
+                        map: mapaMotorista,
+                        title: 'Localização do Cliente'
+                    });
+                }
+                mapaMotorista.panTo(clienteLatLng);
+            }
+        }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMapaCliente"></script>
 </body>
 </html>
