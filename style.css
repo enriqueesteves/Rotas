@@ -1,238 +1,110 @@
-Body, html {
+/* style.css */
+
+body {
   margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: 'Arial', sans-serif;
-  overflow: hidden; /* Para evitar barras de rolagem indesejadas */
-  font-size: 16px; /* Aumentar o tamanho da fonte base */
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #121212;
+  color: #fff;
+  overflow: hidden;
 }
 
 #map {
-  height: 100%;
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
+  z-index: 1;
 }
 
-button, select, input {
-  font-size: 16px !important; /* Aumentar o tamanho da fonte nos controles */
-  padding: 10px !important; /* Aumentar o padding nos controles */
-}
-
-.painel-login {
-  position: absolute;
-  top: 50%; /* Centralizar verticalmente */
-  left: 50%; /* Centralizar horizontalmente */
-  transform: translate(-50%, -50%); /* Ajuste fino para centralização */
-  background: #1c1c1e;
-  padding: 20px; /* Aumentar o padding para mais espaço interno */
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 999;
-  text-align: center; /* Centralizar o texto dentro do painel */
-}
-
-.painel-login button {
-  width: 80%; /* Reduzir a largura para dar mais espaço */
-  padding: 15px; /* Aumentar o padding dos botões de login */
-  margin: 10px 0; /* Aumentar a margem para separação */
-  background-color: #00c851;
-  color: #fff;
+button, select {
+  font-size: 1em;
+  padding: 10px;
   border: none;
-  border-radius: 8px; /* Bordas mais arredondadas */
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 18px; /* Aumentar o tamanho da fonte dos botões de login */
-  transition: background-color 0.3s ease; /* Adicionar uma transição suave */
-}
-
-.painel-login button:hover {
-  background-color: #00a744; /* Escurecer um pouco no hover */
-}
-
-.modal {
-  position: absolute;
-  top: 50%; /* Centralizar verticalmente */
-  left: 50%; /* Centralizar horizontalmente */
-  transform: translate(-50%, -50%); /* Ajuste fino para centralização */
-  background: white;
-  padding: 30px; /* Aumentar o padding do modal */
-  z-index: 999;
-  border-radius: 10px;
-  width: 300px; /* Aumentar a largura para mais espaço */
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-  text-align: center; /* Centralizar o conteúdo */
-}
-
-.modal h3 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  color: #333;
-  font-size: 20px; /* Aumentar o tamanho da fonte do título do modal */
-}
-
-.modal select,
-.modal input,
-.modal button {
-  width: calc(100% - 20px); /* Largura com um pouco de margem interna */
-  padding: 12px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 16px;
-  box-sizing: border-box; /* Para que padding e border não aumentem a largura total */
-}
-
-.modal button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.modal button:hover {
-  background-color: #0056b3;
-}
-
-.painel-info {
-  position: absolute;
-  bottom: 20px;
-  left: 50%; /* Centralizar horizontalmente */
-  transform: translateX(-50%); /* Ajuste fino para centralização */
-  background: #fff;
-  padding: 20px; /* Aumentar o padding */
-  width: 80%; /* Largura responsiva */
-  max-width: 400px; /* Largura máxima */
-  z-index: 999;
   border-radius: 8px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.2);
-  text-align: center;
-}
-
-.painel-info button {
-  padding: 10px 15px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 5px;
   cursor: pointer;
-  font-weight: bold;
-  margin-top: 10px;
-  transition: background-color 0.3s ease;
+  background-color: #1f1f1f;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+  transition: 0.3s;
 }
 
-.painel-info button:hover {
-  background-color: #c82333;
+button:hover, select:hover {
+  background-color: #333;
 }
 
-.hidden {
-  display: none;
-}
-
-.chat {
+.control-panel {
   position: absolute;
-  bottom: 20px;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-radius: 12px;
+  max-width: 300px;
+}
+
+.chat-container {
+  position: absolute;
   right: 20px;
-  background: #fff;
-  width: 350px; /* Aumentar a largura */
-  max-height: 400px; /* Aumentar a altura máxima */
-  border-radius: 10px;
+  bottom: 20px;
+  width: 300px;
+  max-height: 400px;
+  background: #1e1e1e;
+  border-radius: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  z-index: 999;
-  box-shadow: 0 0 15px rgba(0,0,0,0.3);
-  border: 1px solid #ddd; /* Adicionar uma borda sutil */
+  z-index: 1000;
 }
 
-.chat-header {
-  background-color: #f8f9fa;
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.chat-header h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.chat-close-btn, .chat-back-btn {
-  background: none;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 5px;
-  margin-left: 5px;
-}
-
-.chat-close-btn {
-  color: #dc3545;
-}
-
-.chat-back-btn {
-  color: #007bff;
-}
-
-#chatMensagens {
+.chat-messages {
   flex: 1;
-  padding: 15px; /* Aumentar o padding */
   overflow-y: auto;
-  border-bottom: 1px solid #ccc;
+  padding: 10px;
+  font-size: 14px;
+  border-bottom: 1px solid #333;
 }
 
-#chatMensagens div {
-  padding: 8px 0;
-  border-bottom: 1px dashed #eee; /* Separar as mensagens */
+.chat-messages div {
+  margin-bottom: 8px;
 }
 
-#chatMensagens div:last-child {
-  border-bottom: none;
+.chat-input {
+  display: flex;
+  border-top: 1px solid #333;
 }
 
-#mensagem {
-  padding: 15px; /* Aumentar o padding na entrada de mensagem */
+.chat-input input {
+  flex: 1;
+  padding: 10px;
   border: none;
-  width: calc(100% - 80px); /* Ajustar a largura com o botão */
-  font-size: 16px;
-}
-
-.chat button {
-  padding: 15px; /* Aumentar o padding do botão de enviar mensagem */
-  border: none;
-  background: #007bff;
+  border-radius: 0;
+  outline: none;
+  background-color: #2b2b2b;
   color: white;
-  cursor: pointer;
-  width: 70px; /* Ajustar a largura do botão */
-  font-weight: bold;
-  transition: background-color 0.3s ease;
 }
 
-.chat button:hover {
-  background-color: #0056b3;
-}
-
-.solicitacao-marker-container {
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 10px;
-  padding: 5px;
-  text-align: center;
-  border: 1px solid #ccc;
-}
-
-.solicitacao-marker-container span {
-  font-size: 24px;
-  display: block;
-}
-
-.solicitacao-marker-container small {
-  font-size: 12px;
-  color: #333;
-}
-
-.solicitacao-marker {
-  font-size: 24px; /* Tamanho do ícone dentro do container (pode ser ajustado) */
+.chat-input button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
   cursor: pointer;
 }
+
+.chat-input button:hover {
+  background-color: #45a049;
+}
+
+@media (max-width: 600px) {
+  .control-panel {
+    width: 90%;
+    left: 5%;
+  }
+
+  .chat-container {
+    width: 90%;
+    right: 5%;
+  }
+  }
