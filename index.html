@@ -155,6 +155,8 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" rel="stylesheet" />
 
     <script>
         const firebaseConfig = {
@@ -191,6 +193,8 @@
         let mapaMotorista;
         let clienteMarker;
         let minhaLocalizacaoMarker;
+
+        const apiKeyGeoapify = '7de2193e48404eb7aa0af1222a8d7bc4'; // *** SUA CHAVE API GEOAPIFY ***
 
         // Lógica de seleção de usuário
         clienteBtn.addEventListener('click', () => {
@@ -236,15 +240,14 @@
         });
 
         function initMapaCliente(latitude, longitude) {
-            mapaCliente = new google.maps.Map(mapaClienteDiv, {
-                center: {lat: latitude, lng: longitude},
+            const map = new maplibregl.Map({
+                container: 'mapaClienteDiv',
+                style: `https://maps.geoapify.com/v1/styles/osm-bright/style.json?apiKey=${apiKeyGeoapify}`,
+                center: [longitude, latitude],
                 zoom: 15
             });
-            new google.maps.Marker({
-                position: {lat: latitude, lng: longitude},
-                map: mapaCliente,
-                title: 'Sua Localização'
-            });
+            new maplibregl.Marker().setLngLat([longitude, latitude]).addTo(map);
+            mapaCliente = map;
         }
 
         // Lógica do motorista
@@ -270,29 +273,34 @@
                         const minhaLatitude = position.coords.latitude;
                         const minhaLongitude = position.coords.longitude;
 
-                        mapaMotorista = new google.maps.Map(mapaMotoristaDiv, {
-                            center: {lat: minhaLatitude, lng: minhaLongitude},
+                        const map = new maplibregl.Map({
+                            container: 'mapaMotoristaDiv',
+                            style: `https://maps.geoapify.com/v1/styles/osm-bright/style.json?apiKey=${apiKeyGeoapify}`,
+                            center: [minhaLongitude, minhaLatitude],
                             zoom: 15
                         });
-                        minhaLocalizacaoMarker = new google.maps.Marker({
-                            position: {lat: minhaLatitude, lng: minhaLongitude},
-                            map: mapaMotorista,
-                            title: 'Sua Localização'
-                        });
+                        minhaLocalizacaoMarker = new maplibregl.Marker().setLngLat([minhaLongitude, minhaLatitude]).addTo(map);
+                        mapaMotorista = map;
                     },
                     (error) => {
                         console.error('Erro ao obter sua localização: ', error);
-                        mapaMotorista = new google.maps.Map(mapaMotoristaDiv, {
-                            center: {lat: -23.5505, lng: -46.6333},
+                        const map = new maplibregl.Map({
+                            container: 'mapaMotoristaDiv',
+                            style: `https://maps.geoapify.com/v1/styles/osm-bright/style.json?apiKey=${apiKeyGeoapify}`,
+                            center: [-46.6333, -23.5505], // São Paulo
                             zoom: 12
                         });
+                        mapaMotorista = map;
                     }
                 );
             } else {
-                mapaMotorista = new google.maps.Map(mapaMotoristaDiv, {
-                    center: {lat: -23.5505, lng: -46.6333},
+                const map = new maplibregl.Map({
+                    container: 'mapaMotoristaDiv',
+                    style: `https://maps.geoapify.com/v1/styles/osm-bright/style.json?apiKey=${apiKeyGeoapify}`,
+                    center: [-46.6333, -23.5505], // São Paulo
                     zoom: 12
                 });
+                mapaMotorista = map;
                 alert('Seu navegador não suporta geolocalização.');
             }
         }
@@ -313,20 +321,15 @@
 
         function atualizarMapaMotorista(latitudeCliente, longitudeCliente) {
             if (mapaMotorista) {
-                const clienteLatLng = new google.maps.LatLng(latitudeCliente, longitudeCliente);
+                const clienteLngLat = [longitudeCliente, latitudeCliente];
                 if (clienteMarker) {
-                    clienteMarker.setPosition(clienteLatLng);
+                    clienteMarker.setLngLat(clienteLngLat);
                 } else {
-                    clienteMarker = new google.maps.Marker({
-                        position: clienteLatLng,
-                        map: mapaMotorista,
-                        title: 'Localização do Cliente'
-                    });
+                    clienteMarker = new maplibregl.Marker().setLngLat(clienteLngLat).addTo(mapaMotorista);
                 }
-                mapaMotorista.panTo(clienteLatLng);
+                mapaMotorista.flyTo({ center: clienteLngLat, zoom: 15 });
             }
         }
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMapaCliente"></script>
 </body>
 </html>
