@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>upload</title>
+  <style>
+    :root {
+      --primary: #00aaff;
+      --secondary: #00ffcc;
+      --dark: #121212;
+      --darker: #0a0a0a;
+      --light: #ffffff;
+      --gray: #1e1e1e;
+      --success: #00ff18;
+      --danger: #ff3333;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--dark);
+      color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .background-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gradient 5s ease infinite, float 3s ease-in-out infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .auth-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+      max-width: 400px;
+      background-color: var(--gray);
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .auth-tabs {
+      display: flex;
+      width: 100%;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      background-color: #2a2a2a;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .auth-tab.active {
+      background-color: var(--primary);
+      font-weight: bold;
+    }
+
+    .auth-form {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .auth-form.active {
+      display: flex;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background-color: #2a2a2a;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .auth-input:focus {
+      border-color: var(--primary);
+    }
+
+    .auth-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), #0077cc);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .auth-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+        /* Seu CSS continua abaixo... */
+    .app-content {
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .user-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, #ff6666, #cc0000);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .backup-btn {
+      background: linear-gradient(135deg, var(--success), #2E7D32);
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .backup-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .backup-btn:active {
+      transform: translateY(1px);
+    }
+
+    .storage-info {
+      background-color: var(--gray);
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .storage-bar {
+      height: 10px;
+      background-color: #333;
+      border-radius: 5px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .storage-progress {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      width: 0%;
+      transition: width 0.5s;
+    }
+
+    .search-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .search-bar {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background-color: var(--gray);
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .filter-select {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background-color: var(--gray);
+      color: white;
+      outline: none;
+    }
+
+    .file-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .action-btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background-color: #2a2a2a;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .action-btn:hover {
+      background-color: #333;
+    }
+
+    .action-btn.danger {
+      background-color: var(--danger);
+    }
+
+    .loading-indicator {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      padding: 30px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0,0,0,0.1);
+      border-radius: 50%;
+      border-left-color: var(--primary);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .empty-state i {
+      font-size: 50px;
+      color: #555;
+    }
+
+    .file-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .file-card {
+      background-color: var(--gray);
+      border-radius: 8px;
+      padding: 15px;
+      transition: transform 0.2s;
+    }
+
+    .file-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .file-select {
+      margin-right: 10px;
+    }
+
+    .file-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+
+    .file-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-details {
+      display: flex;
+      justify-content: space-between;
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background-color: var(--gray);
+      padding: 25px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .modal-btn.confirm {
+      background-color: var(--success);
+      color: white;
+    }
+.modal-btn.cancel {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #323232;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 1001;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    .toast.success {
+      background-color: #2e7d32;
+    }
+
+    .toast.error {
+      background-color: #c62828;
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: 2rem;
+      }
+      
+      .file-list {
+        grid-template-columns: 1fr;
+      }
+      
+      .search-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="backgroundCanvas" class="background-canvas"></canvas>
+  
+  <div class="container">
+    <header class="header">
+      <h1 class="title">upload</h1>
+      <p class="subtitle">Seus arquivos seguros na nuvem</p>
+    </header>
+
+    <div id="authContainer" class="auth-container">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="loginTab">Entrar</div>
+        <div class="auth-tab" id="registerTab">Cadastrar</div>
+      </div>
+      
+      <div id="loginForm" class="auth-form active">
+        <input type="email" id="emailInput" class="auth-input" placeholder="Seu email" required>
+        <input type="password" id="passwordInput" class="auth-input" placeholder="Sua senha" required>
+        <button class="auth-btn" id="loginBtn">Entrar</button>
+      </div>
+      
+      <div id="registerForm" class="auth-form">
+        <input type="email" id="registerEmailInput" class="auth-input" placeholder="Seu email" required>
+        <input type="password" id="registerPasswordInput" class="auth-input" placeholder="Sua senha" required>
+        <input type="password" id="registerConfirmPasswordInput" class="auth-input" placeholder="Confirme sua senha" required>
+        <button class="auth-btn" id="registerBtn">Cadastrar</button>
+      </div>
+    </div>
+    
+    <div id="appContent" class="app-content">
+      <div class="user-info">
+        <span id="userEmail"></span>
+        <button class="logout-btn" id="logoutBtn">
+          <i class="fas fa-sign-out-alt"></i> Sair
+        </button>
+      </div>
+      
+      <button class="backup-btn" id="backupBtn">
+        <i class="fas fa-cloud-upload-alt"></i> Backup 
+      </button>
+      
+      <div class="storage-info">
+        <div>Seu armazenamento</div>
+        <div class="storage-bar">
+          <div class="storage-progress" id="storageProgress"></div>
+        </div>
+        <div class="storage-text" id="storageText">0MB de 40GB usado</div>
+      </div>
+
+      <div class="search-container">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Buscar arquivos...">
+        <select id="fileTypeFilter" class="filter-select">
+          <option value="all">Todos os tipos</option>
+          <option value="image">Imagens</option>
+          <option value="video">Vídeos</option>
+          <option value="document">Documentos</option>
+        </select>
+      </div>
+
+      <div class="file-actions">
+        <button class="action-btn" id="refreshBtn">
+          <i class="fas fa-sync-alt"></i> Atualizar
+        </button>
+        <button class="action-btn danger" id="deleteSelectedBtn" disabled>
+          <i class="fas fa-trash-alt"></i> Excluir selecionados
+        </button>
+      </div>
+
+      <div class="file-list-container">
+        <div id="loadingIndicator" class="loading-indicator">
+          <div class="spinner"></div>
+          <span>Carregando arquivos...</span>
+        </div>
+        
+        <div id="emptyState" class="empty-state">
+          <i class="fas fa-folder-open"></i>
+          <h3>Nenhum arquivo encontrado</h3>
+          <p>Faça upload de arquivos usando o botão de Backup</p>
+        </div>
+        
+        <div id="fileList" class="file-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="fileInput" multiple style="display: none;">
+
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <h2>Confirmar Ação</h2>
+      <p id="modalMessage">Deseja realmente executar esta ação?</p>
+      <div class="modal-actions">
+        <button class="modal-btn confirm" id="confirmActionBtn">Confirmar</button>
+        <button class="modal-btn cancel" id="cancelActionBtn">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBaUW_ih2lxM9DRftochEBQUczXSPDx7vg",
+      authDomain: "banco-40005.firebaseapp.com",
+      databaseURL: "https://banco-40005-default-rtdb.firebaseio.com",
+      projectId: "banco-40005",
+      storageBucket: "banco-40005.appspot.com",
+      messagingSenderId: "979660568413",
+      appId: "1:979660568413:web:24e2510d5f840d45121ab4",
+      measurementId: "G-TDHZS843JH"
+    };
+
+    // Inicializa o Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // URL da sua API do Apps Script
+    const API_URL = "https://script.google.com/macros/s/AKfycbz2z33bEbWlWKk92gTbphuxAdZKeGAwzNa9qKjdwyntiYdivoBIhT2HssJASpxQU4AG/exec";
+
+    // Variáveis globais
+    let currentUser = null;
+    let userFiles = [];
+    let selectedFiles = [];
+    let totalStorageUsed = 0;
+    const MAX_STORAGE = 15 * 1024 * 1024 * 1024; // 40GB em bytes
+
+    // Elementos do DOM
+    const elements = {
+      authContainer: document.getElementById('authContainer'),
+      appContent: document.getElementById('appContent'),
+      loginTab: document.getElementById('loginTab'),
+      registerTab: document.getElementById('registerTab'),
+      loginForm: document.getElementById('loginForm'),
+      registerForm: document.getElementById('registerForm'),
+      emailInput: document.getElementById('emailInput'),
+      passwordInput: document.getElementById('passwordInput'),
+      registerEmailInput: document.getElementById('registerEmailInput'),
+      registerPasswordInput: document.getElementById('registerPasswordInput'),
+      registerConfirmPasswordInput: document.getElementById('registerConfirmPasswordInput'),
+      loginBtn: document.getElementById('loginBtn'),
+      registerBtn: document.getElementById('registerBtn'),
+      logoutBtn: document.getElementById('logoutBtn'),
+      backupBtn: document.getElementById('backupBtn'),
+      fileInput: document.getElementById('fileInput'),
+      userEmail: document.getElementById('userEmail'),
+      storageProgress: document.getElementById('storageProgress'),
+      storageText: document.getElementById('storageText'),
+      searchInput: document.getElementById('searchInput'),
+      fileTypeFilter: document.getElementById('fileTypeFilter'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      deleteSelectedBtn: document.getElementById('deleteSelectedBtn'),
+      fileList: document.getElementById('fileList'),
+      loadingIndicator: document.getElementById('loadingIndicator'),
+      emptyState: document.getElementById('emptyState'),
+      confirmationModal: document.getElementById('confirmationModal'),
+      modalMessage: document.getElementById('modalMessage'),
+      confirmActionBtn: document.getElementById('confirmActionBtn'),
+      cancelActionBtn: document.getElementById('cancelActionBtn'),
+      toast: document.getElementById('toast')
+    };
+
+    // Event Listeners
+    elements.loginTab.addEventListener('click', () => switchAuthTab('login'));
+    elements.registerTab.addEventListener('click', () => switchAuthTab('register'));
+    elements.loginBtn.addEventListener('click', loginUser);
+    elements.registerBtn.addEventListener('click', registerUser);
+    elements.logoutBtn.addEventListener('click', logoutUser);
+    elements.backupBtn.addEventListener('click', triggerBackup);
+    elements.fileInput.addEventListener('change', handleFileUpload);
+    elements.refreshBtn.addEventListener('click', loadUserFiles);
+    elements.deleteSelectedBtn.addEventListener('click', confirmDeleteSelected);
+    elements.searchInput.addEventListener('input', filterFiles);
+    elements.fileTypeFilter.addEventListener('change', filterFiles);
+    elements.confirmActionBtn.addEventListener('click', executeModalAction);
+    elements.cancelActionBtn.addEventListener('click', closeModal);
+
+    // Verifica estado de autenticação
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        elements.userEmail.textContent = user.email;
+        elements.authContainer.style.display = 'none';
+        elements.appContent.style.display = 'flex';
+        loadUserFiles();
+        calculateStorageUsage();
+      } else {
+        currentUser = null;
+        elements.authContainer.style.display = 'flex';
+        elements.appContent.style.display = 'none';
+      }
+    });
+
+    // Funções de autenticação
+    function switchAuthTab(tab) {
+      if (tab === 'login') {
+        elements.loginTab.classList.add('active');
+        elements.registerTab.classList.remove('active');
+        elements.loginForm.classList.add('active');
+        elements.registerForm.classList.remove('active');
+      } else {
+        elements.loginTab.classList.remove('active');
+        elements.registerTab.classList.add('active');
+        elements.loginForm.classList.remove('active');
+        elements.registerForm.classList.add('active');
+      }
+    }
+
+    async function loginUser() {
+      const email = elements.emailInput.value;
+      const password = elements.passwordInput.value;
+      
+      if (!email || !password) {
+        showToast('Preencha email e senha', 'error');
+        return;
+      }
+      
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        showToast('Login realizado com sucesso', 'success');
+      } catch (error) {
+        showToast(`Erro no login: ${error.message}`, 'error');
+      }
+    }
+
+    async function registerUser() {
+      const email = elements.registerEmailInput.value;
+      const password = elements.registerPasswordInput.value;
+      const confirmPassword = elements.registerConfirmPasswordInput.value;
+      
+      if (!email || !password || !confirmPassword) {
+        showToast('Preencha todos os campos', 'error');
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        showToast('As senhas não coincidem', 'error');
+        return;
+      }
+      
+      if (password.length < 6) {
+        showToast('A senha deve ter pelo menos 6 caracteres', 'error');
+        return;
+      }
+      
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const token = await userCredential.user.getIdToken();
+        
+        // Cria a pasta do usuário no Drive via API
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'createUserFolder',
+            token: token
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast('Cadastro realizado com sucesso!', 'success');
+          switchAuthTab('login');
+          elements.registerEmailInput.value = '';
+          elements.registerPasswordInput.value = '';
+          elements.registerConfirmPasswordInput.value = '';
+        } else {
+          throw new Error(result.error || 'Erro ao criar pasta no Drive');
+        }
+      } catch (error) {
+        showToast(`Erro no cadastro: ${error.message}`, 'error');
+        if (auth.currentUser) await auth.currentUser.delete();
+      }
+    }
+
+    async function logoutUser() {
+      try {
+        await auth.signOut();
+        showToast('Logout realizado com sucesso', 'success');
+      } catch (error) {
+        showToast(`Erro ao fazer logout: ${error.message}`, 'error');
+      }
+    }
+
+    // Funções de arquivos
+    function triggerBackup() {
+      elements.fileInput.click();
+    }
+
+    async function handleFileUpload(event) {
+      const files = Array.from(event.target.files);
+      if (files.length === 0) return;
+
+      try {
+        const token = await currentUser.getIdToken();
+        let uploadedCount = 0;
+        
+        showToast(`Enviando ${files.length} arquivos...`, 'info');
+        
+        for (const file of files) {
+          if (totalStorageUsed + file.size > MAX_STORAGE) {
+            showToast('Limite de armazenamento excedido', 'error');
+            break;
+          }
+
+          const reader = new FileReader();
+          reader.onload = async function(e) {
+            const base64Data = e.target.result.split(',')[1];
+            
+            try {
+              await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  action: 'upload',
+                  token: token,
+                  fileData: base64Data,
+                  fileName: file.name,
+                  mimeType: file.type
+                })
+              });
+              
+              uploadedCount++;
+              if (uploadedCount === files.length) {
+                showToast('Upload concluído com sucesso!', 'success');
+                loadUserFiles();
+                calculateStorageUsage();
+              }
+            } catch (error) {
+              showToast(`Erro ao enviar ${file.name}: ${error.message}`, 'error');
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      } catch (error) {
+        showToast(`Erro no upload: ${error.message}`, 'error');
+      }
+    }
+
+    async function loadUserFiles() {
+      if (!currentUser) return;
+      
+      try {
+elements.loadingIndicator.style.display = 'flex';
+        elements.emptyState.style.display = 'none';
+        elements.fileList.innerHTML = '';
+        
+        const token = await currentUser.getIdToken();
+        const response = await fetch(`${API_URL}?action=listFiles&token=${encodeURIComponent(token)}`);
+        const result = await response.json();
+        
+        if (result.error) throw new Error(result.error);
+        
+        userFiles = result.files || [];
+        renderFileList(userFiles);
+      } catch (error) {
+        showToast(`Erro ao carregar arquivos: ${error.message}`, 'error');
+      } finally {
+        elements.loadingIndicator.style.display = 'none';
+        if (userFiles.length === 0) elements.emptyState.style.display = 'flex';
+      }
+    }
+
+    function renderFileList(files) {
+      elements.fileList.innerHTML = '';
+      
+      if (files.length === 0) {
+        elements.emptyState.style.display = 'flex';
+        return;
+      }
+      
+      files.forEach(file => {
+        const fileCard = document.createElement('div');
+        fileCard.className = 'file-card';
+        fileCard.dataset.id = file.id;
+        fileCard.dataset.type = file.mimeType.split('/')[0];
+        
+        const fileIcon = document.createElement('i');
+        fileIcon.className = getFileIcon(file.mimeType);
+        
+        const fileName = document.createElement('div');
+        fileName.className = 'file-name';
+        fileName.textContent = file.name;
+        
+        const fileDetails = document.createElement('div');
+        fileDetails.className = 'file-details';
+        
+        const fileSize = document.createElement('span');
+        fileSize.textContent = formatFileSize(file.size);
+        
+        const fileDate = document.createElement('span');
+        fileDate.textContent = new Date(file.created).toLocaleDateString();
+        
+        fileDetails.appendChild(fileSize);
+        fileDetails.appendChild(fileDate);
+        
+        const fileActions = document.createElement('div');
+        fileActions.className = 'file-actions';
+        
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'action-btn small';
+        downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+        downloadBtn.onclick = () => downloadFile(file);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'action-btn small danger';
+        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteBtn.onclick = () => confirmDelete(file.id);
+        
+        const selectCheckbox = document.createElement('input');
+        selectCheckbox.type = 'checkbox';
+        selectCheckbox.className = 'file-select';
+        selectCheckbox.onchange = (e) => {
+          if (e.target.checked) {
+            selectedFiles.push(file.id);
+          } else {
+            selectedFiles = selectedFiles.filter(id => id !== file.id);
+          }
+          updateSelectionUI();
+        };
+        
+        fileActions.appendChild(downloadBtn);
+        fileActions.appendChild(deleteBtn);
+        fileCard.appendChild(selectCheckbox);
+        fileCard.appendChild(fileIcon);
+        fileCard.appendChild(fileName);
+        fileCard.appendChild(fileDetails);
+        fileCard.appendChild(fileActions);
+        
+        elements.fileList.appendChild(fileCard);
+      });
+    }
+
+    function filterFiles() {
+      const searchTerm = elements.searchInput.value.toLowerCase();
+      const fileType = elements.fileTypeFilter.value;
+      
+      const filteredFiles = userFiles.filter(file => {
+        const matchesSearch = file.name.toLowerCase().includes(searchTerm);
+        const matchesType = fileType === 'all' || 
+                          (fileType === 'image' && file.mimeType.startsWith('image/')) ||
+                          (fileType === 'video' && file.mimeType.startsWith('video/')) ||
+                          (fileType === 'document' && (
+                            file.mimeType.startsWith('application/pdf') || 
+                            file.mimeType.includes('document')
+                          ));
+        return matchesSearch && matchesType;
+      });
+      
+      renderFileList(filteredFiles);
+    }
+
+    function getFileIcon(mimeType) {
+      if (mimeType.startsWith('image/')) return 'fas fa-file-image';
+      if (mimeType.startsWith('video/')) return 'fas fa-file-video';
+      if (mimeType === 'application/pdf') return 'fas fa-file-pdf';
+      if (mimeType.includes('document')) return 'fas fa-file-word';
+      return 'fas fa-file';
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+      return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+    }
+
+    function updateSelectionUI() {
+      elements.deleteSelectedBtn.disabled = selectedFiles.length === 0;
+    }
+
+    async function calculateStorageUsage() {
+      if (!currentUser) return;
+      
+      try {
+        const token = await currentUser.getIdToken();
+        const response = await fetch(`${API_URL}?action=getStorageUsage&token=${encodeURIComponent(token)}`);
+        const result = await response.json();
+        
+        if (result.error) throw new Error(result.error);
+        
+        totalStorageUsed = result.totalUsage || 0;
+        const percentage = Math.min(100, (totalStorageUsed / MAX_STORAGE) * 100);
+        
+        elements.storageProgress.style.width = `${percentage}%`;
+        elements.storageText.textContent = `${formatFileSize(totalStorageUsed)} de ${formatFileSize(MAX_STORAGE)} usado`;
+        
+        // Alerta visual quando perto do limite
+        if (percentage > 90) {
+          elements.storageProgress.style.backgroundColor = 'var(--danger)';
+        } else if (percentage > 70) {
+          elements.storageProgress.style.backgroundColor = 'orange';
+        } else {
+          elements.storageProgress.style.backgroundColor = 'var(--success)';
+        }
+      } catch (error) {
+        console.error("Erro ao calcular uso de armazenamento:", error);
+      }
+    }
+
+    async function downloadFile(file) {
+      try {
+        // Abre o link de download em nova aba
+        window.open(file.downloadUrl || file.url, '_blank');
+      } catch (error) {
+        showToast(`Erro ao baixar arquivo: ${error.message}`, 'error');
+      }
+    }
+
+    function confirmDelete(fileId) {
+      selectedFiles = [fileId];
+      elements.modalMessage.textContent = "Deseja excluir permanentemente este arquivo?";
+      elements.confirmActionBtn.dataset.action = 'delete';
+      elements.confirmationModal.style.display = 'flex';
+    }
+
+    function confirmDeleteSelected() {
+      if (selectedFiles.length === 0) return;
+      elements.modalMessage.textContent = `Deseja excluir permanentemente ${selectedFiles.length} arquivo(s) selecionado(s)?`;
+      elements.confirmActionBtn.dataset.action = 'delete';
+      elements.confirmationModal.style.display = 'flex';
+    }
+
+    async function executeModalAction() {
+      const action = elements.confirmActionBtn.dataset.action;
+      
+      try {
+        if (action === 'delete') {
+          await deleteSelectedFiles();
+        }
+      } catch (error) {
+        showToast(`Erro ao executar ação: ${error.message}`, 'error');
+      } finally {
+        closeModal();
+      }
+    }
+
+    async function deleteSelectedFiles() {
+      if (!currentUser || selectedFiles.length === 0) return;
+      
+      try {
+        const token = await currentUser.getIdToken();
+        
+        const promises = selectedFiles.map(fileId => 
+          fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'deleteFile',
+              token: token,
+              fileId: fileId
+            })
+          })
+        );
+        
+        await Promise.all(promises);
+        showToast(`${selectedFiles.length} arquivo(s) excluído(s) com sucesso`, 'success');
+        selectedFiles = [];
+        loadUserFiles();
+        calculateStorageUsage();
+      } catch (error) {
+        throw new Error(`Falha ao excluir arquivos: ${error.message}`);
+      }
+    }
+
+    function closeModal() {
+      elements.confirmationModal.style.display = 'none';
+      elements.confirmActionBtn.dataset.action = '';
+    }
+
+    function showToast(message, type = 'info') {
+      elements.toast.textContent = message;
+      elements.toast.className = 'toast show';
+      
+      // Remove classes de tipo anteriores
+      elements.toast.classList.remove('success', 'error', 'info', 'warning');
+      
+      // Adiciona classe do tipo atual
+      elements.toast.classList.add(type);
+      
+      setTimeout(() => {
+        elements.toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Animação de fundo
+    const canvas = document.getElementById('backgroundCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initParticles();
+    }
+
+    function initParticles() {
+      particles = [];
+      const particleCount = Math.floor(window.innerWidth * window.innerHeight / 10000);
+      
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 3 + 1,
+          speedX: (Math.random() - 0.5) * 0.5,
+          speedY: (Math.random() - 0.5) * 0.5,
+          color: `rgba(0, 170, 255, ${Math.random() * 0.5 + 0.1})`
+        });
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      for (let particle of particles) {
+        particle.x += particle.speedX;
+        particle.y += particle.speedY;
+        
+        // Rebate nas bordas
+        if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1;
+        if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1;
+        
+        ctx.fillStyle = particle.color;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
+      requestAnimationFrame(animateParticles);
+    }
+
+    // Inicialização
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    animateParticles();
+  </script>
+</body>
+</html>
