@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoachApp - Sistema de Treino</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --danger: #f72585;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --active-toggle: #28a745; /* Green for active */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 0 15px;
+        }
+
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            color: var(--gray);
+        }
+
+        .section {
+            margin: 20px 0;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .timer-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .timer-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn i {
+            margin-right: 5px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .btn-info {
+            background-color: #0d6efd; /* Bootstrap --bs-info */
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #0a58ca;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .student-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .student-item:last-child {
+            border-bottom: none;
+        }
+
+        .student-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        .student-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .student-stat-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .student-stat-item i {
+            margin-right: 5px;
+        }
+
+        .fatigue-indicator {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .fatigue-bar {
+            height: 6px;
+            background-color: var(--light-gray);
+            border-radius: 3px;
+            flex: 1;
+            margin-right: 10px;
+            overflow: hidden;
+        }
+
+        .fatigue-level {
+            height: 100%;
+            background-color: var(--danger);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .training-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .training-soco {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+
+        .training-chute {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+
+        .training-descanso {
+            background-color: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+
+        .training-default {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .training-types {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .training-type {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+        }
+
+        .training-type:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .training-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .training-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .training-count {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 3px;
+        }
+
+        .action-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            padding: 10px 15px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--gray);
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+
+        .action-btn i {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+
+        .action-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--light-gray);
+        }
+
+        .empty-state p {
+            margin-top: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 15px;
+        }
+
+        .modal-footer {
+            padding: 15px;
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background-color: var(--light-gray);
+            color: var(--gray);
+        }
+
+        /* Toggle Switch Styling */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--active-toggle);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--active-toggle);
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(16px);
+            -ms-transform: translateX(16px);
+            transform: translateX(16px);
+        }
+
+        .student-training-selector {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .training-option {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 3px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            background-color: var(--light-gray);
+            color: var(--dark);
+        }
+
+        .training-option:hover, .training-option.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .rest-all-btn {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .training-options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .training-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .training-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: white;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .training-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .training-action-btn i {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .training-action-btn.soco {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+
+        .training-action-btn.chute {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+
+        .training-action-btn.descanso {
+            background-color: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+
+        @media (max-width: 480px) {
+            .training-types {
+                grid-template-columns: 1fr;
+            }
+            
+            .training-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    </head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">CoachApp</div>
+            <div class="nav-icon">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="dashboard-tab" class="tab-content active">
+            <div class="section">
+                <div class="timer-card">
+                    <div class="timer-display" id="timer">05:00</div>
+                    <div class="timer-controls">
+                        <button id="startTimer" class="btn btn-success btn-sm"><i class="fas fa-play"></i> Iniciar</button>
+                        <button id="pauseTimer" class="btn btn-danger btn-sm"><i class="fas fa-pause"></i> Pausar</button>
+                        <button id="resetTimer" class="btn btn-warning btn-sm"><i class="fas fa-redo"></i></button>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button id="autoRotateTraining" class="btn btn-info btn-block">
+                            <i class="fas fa-sync-alt"></i> Revezar Treinos
+                        </button>
+                        <button id="restAllBtn" class="btn btn-warning btn-block rest-all-btn">
+                            <i class="fas fa-bed"></i> Descanso Geral
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><i class="fas fa-dumbbell"></i> Ações Rápidas</div>
+                <div class="card">
+                    <div class="training-actions" id="trainingActions">
+                        <!-- Os botões serão adicionados dinamicamente via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><i class="fas fa-cog"></i> Configurações do Treino</div>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label">Duração do Treino (minutos)</label>
+                        <input type="number" id="trainingDuration" class="form-control" value="60" min="1">
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-title"><i class="fas fa-users"></i> Resumo dos Alunos</div>
+                <div class="card">
+                    <div id="studentsSummary"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><i class="fas fa-dumbbell"></i> Treinos Ativos</div>
+                <div id="trainingTypes" class="training-types"></div>
+            </div>
+        </div>
+        
+        <div id="students-tab" class="tab-content">
+            <div class="section">
+                <div class="section-title"><i class="fas fa-user-plus"></i> Adicionar Aluno</div>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label">Nome do Aluno</label>
+                        <input type="text" id="studentName" class="form-control" placeholder="Digite o nome do aluno">
+                    </div>
+                    <button id="addStudent" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Adicionar Aluno</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><i class="fas fa-list"></i> Lista de Alunos</div>
+                <div class="card">
+                    <div id="studentsContainer"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="trainings-tab" class="tab-content">
+            <div class="section">
+                <div class="section-title"><i class="fas fa-plus-circle"></i> Adicionar Treino</div>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label">Nome do Treino</label>
+                        <input type="text" id="trainingName" class="form-control" placeholder="Digite o nome do treino">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Kcal Queimadas por Minuto (aprox.)</label>
+                        <input type="number" id="trainingKcal" class="form-control" value="0" min="0">
+                    </div>
+                    <button id="addTraining" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Adicionar Treino</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><i class="fas fa-dumbbell"></i> Treinos Disponíveis</div>
+                <div class="card">
+                    <div id="trainingsContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="assignTrainingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Atribuir Treino</div>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Selecione o treino para <strong id="modalStudentName"></strong>:</p>
+                <div id="modalTrainingOptions"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelAssign" class="btn btn-sm">Cancelar</button>
+                <button id="confirmAssign" class="btn btn-primary btn-sm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="#" class="action-btn active" data-tab="dashboard-tab">
+            <i class="fas fa-home"></i>
+            <span>Início</span>
+        </a>
+        <a href="#" class="action-btn" data-tab="students-tab">
+            <i class="fas fa-users"></i>
+            <span>Alunos</span>
+        </a>
+        <a href="#" class="action-btn" data-tab="trainings-tab">
+            <i class="fas fa-dumbbell"></i>
+            <span>Treinos</span>
+        </a>
+    </div>
+    <script>
+      
+        // Estado da aplicação
+    const state = {
+        trainings: [
+            { id: 'soco', name: 'Soco', kcalPerMin: 10, fatigueIncrease: 10, active: true },
+            { id: 'chute', name: 'Chute', kcalPerMin: 12, fatigueIncrease: 12, active: true },
+            { id: 'descanso', name: 'Descanso', kcalPerMin: 0, fatigueRecovery: -20, active: true }
+        ],
+        students: [],
+        timer: null,
+        isRunning: false,
+        currentTab: 'dashboard-tab',
+        modal: {
+            studentId: null,
+            selectedTraining: null
+        },
+        // Timer persistente
+        startTimestamp: null,
+        lastSavedTime: 0,
+        initialDuration: 5 * 60,
+        lastUpdate: null
+    };
+
+    // Elementos do DOM
+    const DOM = {
+        timerDisplay: document.getElementById('timer'),
+        startTimerBtn: document.getElementById('startTimer'),
+        pauseTimerBtn: document.getElementById('pauseTimer'),
+        resetTimerBtn: document.getElementById('resetTimer'),
+        trainingDuration: document.getElementById('trainingDuration'),
+        studentName: document.getElementById('studentName'),
+        addStudentBtn: document.getElementById('addStudent'),
+        trainingName: document.getElementById('trainingName'),
+        trainingKcal: document.getElementById('trainingKcal'),
+        addTrainingBtn: document.getElementById('addTraining'),
+        studentsContainer: document.getElementById('studentsContainer'),
+        trainingsContainer: document.getElementById('trainingsContainer'),
+        trainingTypes: document.getElementById('trainingTypes'),
+        trainingActions: document.getElementById('trainingActions'),
+        studentsSummary: document.getElementById('studentsSummary'),
+        assignTrainingModal: document.getElementById('assignTrainingModal'),
+        modalStudentName: document.getElementById('modalStudentName'),
+        modalTrainingOptions: document.getElementById('modalTrainingOptions'),
+        cancelAssign: document.getElementById('cancelAssign'),
+        confirmAssign: document.getElementById('confirmAssign'),
+        tabLinks: document.querySelectorAll('.action-btn'),
+        autoRotateTrainingBtn: document.getElementById('autoRotateTraining'),
+        restAllBtn: document.getElementById('restAllBtn')
+    };
+
+    // Funções de Utilitário
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    }
+
+    function saveToLocalStorage() {
+        const stateToSave = {
+            ...state,
+            timer: null // Não salvamos a referência do timer
+        };
+        localStorage.setItem('coachAppState', JSON.stringify(stateToSave));
+    }
+
+    function loadFromLocalStorage() {
+        const savedState = localStorage.getItem('coachAppState');
+        if (savedState) {
+            const parsedState = JSON.parse(savedState);
+
+            // Carrega os dados normais
+            if (parsedState.trainings) {
+                state.trainings = parsedState.trainings;
+            }
+            if (parsedState.students) {
+                state.students = parsedState.students;
+            }
+
+            // Restaura o estado do timer
+            if (parsedState.isRunning && parsedState.startTimestamp) {
+                const now = Math.floor(Date.now() / 1000);
+                const elapsed = now - parsedState.startTimestamp;
+                state.initialDuration = parsedState.initialDuration || 5 * 60;
+                state.timeLeft = Math.max(0, state.initialDuration - elapsed);
+                
+                if (state.timeLeft <= 0) {
+                    state.isRunning = false;
+                    state.startTimestamp = null;
+                    state.timeLeft = state.initialDuration;
+                } else {
+                    state.isRunning = true;
+                    state.startTimestamp = now - (state.initialDuration - state.timeLeft);
+                }
+            } else {
+                state.timeLeft = parsedState.timeLeft || state.initialDuration;
+                state.isRunning = false;
+            }
+        }
+    }
+
+    function getTrainingClass(trainingName) {
+        switch (trainingName.toLowerCase()) {
+            case 'soco': return 'training-soco';
+            case 'chute': return 'training-chute';
+            case 'descanso': return 'training-descanso';
+            default: return 'training-default';
+        }
+    }
+
+    function getTrainingIcon(trainingName) {
+        switch (trainingName.toLowerCase()) {
+            case 'soco': return 'fas fa-hand-rock';
+            case 'chute': return 'fas fa-shoe-prints';
+            case 'descanso': return 'fas fa-bed';
+            default: return 'fas fa-dumbbell';
+        }
+    }
+
+    // Funções de Renderização
+    function renderTimer() {
+        DOM.timerDisplay.textContent = formatTime(state.timeLeft);
+    }
+
+    function renderTrainingActions() {
+        DOM.trainingActions.innerHTML = '';
+        const activeTrainings = state.trainings.filter(t => t.active);
+        
+        activeTrainings.forEach(training => {
+            const actionBtn = document.createElement('div');
+            actionBtn.className = `training-action-btn ${training.id}`;
+            actionBtn.innerHTML = `
+                <i class="${getTrainingIcon(training.name)}"></i>
+                <span>${training.name}</span>
+            `;
+            actionBtn.addEventListener('click', () => {
+                assignTrainingToAll(training.id);
+            });
+            DOM.trainingActions.appendChild(actionBtn);
+        });
+    }
+
+    function renderStudents() {
+        DOM.studentsContainer.innerHTML = '';
+        if (state.students.length === 0) {
+            DOM.studentsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-users-slash"></i>
+                    <p>Nenhum aluno cadastrado. Adicione um aluno para começar!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        state.students.forEach(student => {
+            const studentDiv = document.createElement('div');
+            studentDiv.className = 'student-item';
+            studentDiv.innerHTML = `
+                <div class="student-avatar">${student.name.charAt(0).toUpperCase()}</div>
+                <div class="student-info">
+                    <div class="student-name">${student.name}
+                        <label class="toggle-switch">
+                            <input type="checkbox" data-student-id="${student.id}" ${student.active ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="student-stats">
+                        <span class="student-stat-item">
+                            <i class="fas fa-running"></i>
+                            Treino: <span id="student-training-${student.id}">${student.currentTraining || 'Nenhum'}</span>
+                        </span>
+                        <span class="student-stat-item">
+                            <i class="fas fa-fire"></i>
+                            Kcal: ${student.kcalBurned.toFixed(0)}
+                        </span>
+                    </div>
+                    <div class="fatigue-indicator">
+                        <div class="fatigue-bar">
+                            <div class="fatigue-level" style="width: ${Math.min(100, student.fatigue)}%"></div>
+                        </div>
+                        <span class="fatigue-value">${Math.min(100, Math.round(student.fatigue))}% Fadiga</span>
+                    </div>
+                </div>
+                <button class="btn btn-danger btn-sm delete-student-btn" data-student-id="${student.id}" style="margin-left: 10px;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            DOM.studentsContainer.appendChild(studentDiv);
+        });
+
+        document.querySelectorAll('.delete-student-btn').forEach(button => {
+            button.addEventListener('click', deleteStudent);
+        });
+
+        document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+            toggle.addEventListener('change', toggleStudentActiveStatus);
+        });
+    }
+
+    function renderTrainings() {
+        DOM.trainingsContainer.innerHTML = '';
+        if (state.trainings.length === 0) {
+            DOM.trainingsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-dumbbell"></i>
+                    <p>Nenhum treino disponível. Adicione um treino!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        state.trainings.forEach(training => {
+            const trainingDiv = document.createElement('div');
+            trainingDiv.className = 'card';
+            trainingDiv.setAttribute('data-training-id', training.id);
+            trainingDiv.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="training-name" style="font-size: 1.1rem;">${training.name} 
+                        <span class="badge">${training.kcalPerMin} Kcal/min</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" data-training-id="${training.id}" ${training.active ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                    </span>
+                    <button class="btn btn-danger btn-sm delete-training-btn" data-training-id="${training.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            DOM.trainingsContainer.appendChild(trainingDiv);
+        });
+        
+        document.querySelectorAll('.delete-training-btn').forEach(button => {
+            button.addEventListener('click', deleteTraining);
+        });
+        
+        document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+            toggle.addEventListener('change', toggleTrainingActiveStatus);
+        });
+    }
+
+    function renderTrainingTypes() {
+        DOM.trainingTypes.innerHTML = '';
+        const activeTrainings = state.trainings.filter(t => t.active);
+        
+        activeTrainings.forEach(training => {
+            const trainingTypeDiv = document.createElement('div');
+            trainingTypeDiv.className = `training-type`;
+            trainingTypeDiv.setAttribute('data-training-id', training.id);
+            trainingTypeDiv.innerHTML = `
+                <i class="${getTrainingIcon(training.name)} training-icon"></i>
+                <div class="training-name">${training.name}</div>
+                <div class="training-count">Alunos: ${state.students.filter(s => s.currentTraining === training.name && s.active).length}</div>
+            `;
+            DOM.trainingTypes.appendChild(trainingTypeDiv);
+        });
+    }
+
+    function renderStudentsSummary() {
+        DOM.studentsSummary.innerHTML = '';
+        const activeStudents = state.students.filter(s => s.active);
+        
+        activeStudents.forEach(student => {
+            const studentDiv = document.createElement('div');
+            studentDiv.className = 'student-item';
+            studentDiv.setAttribute('data-student-id', student.id);
+            studentDiv.innerHTML = `
+                <div class="student-avatar">${student.name.charAt(0).toUpperCase()}</div>
+                <div class="student-info">
+                    <div class="student-name">${student.name}</div>
+                    <div class="training-options-container">
+                        ${state.trainings.filter(t => t.active).map(training => 
+                            `<span class="training-option ${student.currentTraining === training.name ? 'active' : ''}" 
+                                  data-training-id="${training.id}" 
+                                  data-student-id="${student.id}">
+                                ${training.name}
+                            </span>`
+                        ).join('')}
+                        <span class="training-option ${!student.currentTraining ? 'active' : ''}" 
+                              data-training-id="none" 
+                              data-student-id="${student.id}">
+                            Nenhum
+                        </span>
+                    </div>
+                    <div class="student-stats">
+                        <span class="student-stat-item">
+                            <span class="training-tag ${getTrainingClass(student.currentTraining || '')}">${student.currentTraining || 'Nenhum'}</span>
+                        </span>
+                        <span class="student-stat-item">
+                            <i class="fas fa-fire"></i>
+                            ${student.kcalBurned.toFixed(0)} Kcal
+                        </span>
+                    </div>
+                    <div class="fatigue-indicator">
+                        <div class="fatigue-bar">
+                            <div class="fatigue-level" style="width: ${Math.min(100, Math.round(student.fatigue))}%"></div>
+                        </div>
+                        <span class="fatigue-value">${Math.min(100, Math.round(student.fatigue))}% Fadiga</span>
+                    </div>
+                </div>
+            `;
+            DOM.studentsSummary.appendChild(studentDiv);
+        });
+
+        document.querySelectorAll('.training-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const studentId = this.getAttribute('data-student-id');
+                const trainingId = this.getAttribute('data-training-id');
+                const student = state.students.find(s => s.id.toString() === studentId);
+                
+                if (student) {
+                    if (trainingId === 'none') {
+                        student.currentTraining = null;
+                    } else {
+                        const training = state.trainings.find(t => t.id === trainingId);
+                        if (training) student.currentTraining = training.name;
+                    }
+                    
+                    renderStudentsSummary();
+                    renderStudents();
+                    renderTrainingTypes();
+                    saveToLocalStorage();
+                }
+            });
+        });
+    }
+
+    function renderAll() {
+        renderTimer();
+        renderStudents();
+        renderTrainings();
+        renderTrainingActions();
+        renderStudentsSummary();
+        renderTrainingTypes();
+        switchTab(state.currentTab);
+    }
+    function renderAll() {
+        renderTimer();
+        renderStudents();
+        renderTrainings();
+        renderTrainingActions();
+        renderStudentsSummary();
+        renderTrainingTypes();
+        switchTab(state.currentTab);
+    }
+
+    // Funções do Timer Persistente
+    function startTimer() {
+        if (state.isRunning) return;
+        
+        state.isRunning = true;
+        const now = Math.floor(Date.now() / 1000);
+        state.startTimestamp = now - (state.initialDuration - state.timeLeft);
+        state.lastUpdate = now;
+        DOM.startTimerBtn.disabled = true;
+        DOM.pauseTimerBtn.disabled = false;
+
+        if (state.timer) clearInterval(state.timer);
+        
+        state.timer = setInterval(updateTimer, 1000);
+        saveToLocalStorage();
+    }
+
+    function updateTimer() {
+        const now = Math.floor(Date.now() / 1000);
+        const elapsed = now - state.startTimestamp;
+        const secondsPassed = now - state.lastUpdate;
+        state.timeLeft = Math.max(0, state.initialDuration - elapsed);
+        state.lastUpdate = now;
+        
+        if (state.timeLeft <= 0) {
+            clearInterval(state.timer);
+            state.isRunning = false;
+            state.startTimestamp = null;
+            alert('Tempo de treino esgotado!');
+            resetTimer();
+            return;
+        }
+        
+        // Atualiza os alunos com base no tempo passado
+        updateStudentsStats(secondsPassed);
+
+        renderTimer();
+        renderStudentsSummary();
+        renderStudents();
+        saveToLocalStorage();
+    }
+
+    function updateStudentsStats(secondsPassed) {
+    state.students.filter(s => s.active).forEach(student => {
+        const currentTraining = state.trainings.find(t => t.name === student.currentTraining);
+        if (currentTraining) {
+            // Inicializa kcalBurned e fatigue se não existirem ou forem inválidos
+            if (typeof student.kcalBurned !== 'number' || isNaN(student.kcalBurned)) {
+                student.kcalBurned = 0;
+            }
+            if (typeof student.fatigue !== 'number' || isNaN(student.fatigue)) {
+                student.fatigue = 0;
+            }
+
+            // Calcula as kcal baseado no tempo passado
+            const kcalPerMin = typeof currentTraining.kcalPerMin === 'number' ? currentTraining.kcalPerMin : 0;
+            const kcalAdded = (kcalPerMin / 60) * secondsPassed;
+            student.kcalBurned += kcalAdded;
+
+            // Atualiza a fadiga
+            if (currentTraining.id === 'descanso') {
+                // Diminui a fadiga durante o descanso
+                const fatigueRecovery = typeof currentTraining.fatigueRecovery === 'number' ? currentTraining.fatigueRecovery : 1; // Valor padrão 1 se não existir
+                const fatigueRecovered = (fatigueRecovery / 2) * secondsPassed;
+                student.fatigue = Math.max(0, student.fatigue - fatigueRecovered);
+            } else {
+                // Aumenta a fadiga durante os exercícios
+                const fatigueIncrease = typeof currentTraining.fatigueIncrease === 'number' ? currentTraining.fatigueIncrease : 1; // Valor padrão 1 se não existir
+                const fatigueAdded = (fatigueIncrease / 12) * secondsPassed;
+                student.fatigue = Math.min(100, student.fatigue + fatigueAdded);
+            }
+
+            // Garante que a fadiga não seja NaN após os cálculos
+            if (isNaN(student.fatigue)) {
+                student.fatigue = 0;
+            }
+        }
+    });
+}
+
+                
+            
+   
+
+    function pauseTimer() {
+        if (!state.isRunning) return;
+        
+        clearInterval(state.timer);
+        state.isRunning = false;
+        state.startTimestamp = null;
+        DOM.startTimerBtn.disabled = false;
+        DOM.pauseTimerBtn.disabled = true;
+        saveToLocalStorage();
+    }
+
+    function resetTimer() {
+        clearInterval(state.timer);
+        state.isRunning = false;
+        state.startTimestamp = null;
+        const durationInMinutes = parseInt(DOM.trainingDuration.value);
+        state.initialDuration = durationInMinutes * 60;
+        state.timeLeft = state.initialDuration;
+        
+        state.students.forEach(student => {
+            student.kcalBurned = 0;
+            student.fatigue = 0;
+        });
+
+        renderTimer();
+        renderStudents();
+        renderStudentsSummary();
+        DOM.startTimerBtn.disabled = false;
+        DOM.pauseTimerBtn.disabled = false;
+        saveToLocalStorage();
+    }
+
+    function updateTrainingDuration() {
+        const newDuration = parseInt(DOM.trainingDuration.value);
+        if (newDuration > 0) {
+            if (!state.isRunning) {
+                state.initialDuration = newDuration * 60;
+                state.timeLeft = state.initialDuration;
+                renderTimer();
+                saveToLocalStorage();
+            } else {
+                alert('Não é possível alterar a duração enquanto o treino está ativo. Pause-o primeiro.');
+                DOM.trainingDuration.value = state.initialDuration / 60;
+            }
+        }
+    }
+
+    function checkRunningTimer() {
+        if (state.isRunning && state.startTimestamp) {
+            const now = Math.floor(Date.now() / 1000);
+            const elapsed = now - state.startTimestamp;
+            const secondsPassed = now - (state.lastUpdate || state.startTimestamp);
+            state.timeLeft = Math.max(0, state.initialDuration - elapsed);
+            
+            if (state.timeLeft <= 0) {
+                state.isRunning = false;
+                state.startTimestamp = null;
+                state.timeLeft = state.initialDuration;
+                alert('O tempo de treino esgotou enquanto você estava fora!');
+            } else {
+                // Atualiza as estatísticas dos alunos para o tempo que passou
+                updateStudentsStats(secondsPassed);
+                state.lastUpdate = now;
+                startTimer();
+            }
+        }
+    }
+
+    // Outras funções do sistema
+    function assignTrainingToAll(trainingId) {
+        const training = state.trainings.find(t => t.id === trainingId);
+        if (!training) return;
+
+        state.students.filter(s => s.active).forEach(student => {
+            student.currentTraining = training.name;
+        });
+
+        renderStudents();
+        renderStudentsSummary();
+        renderTrainingTypes();
+        saveToLocalStorage();
+        alert(`Todos os alunos ativos foram colocados para fazer: ${training.name}`);
+    }
+
+    function addStudent() {
+        const name = DOM.studentName.value.trim();
+        if (name) {
+            const newStudent = {
+                id: Date.now(),
+                name: name,
+                currentTraining: null,
+                fatigue: 0,
+                kcalBurned: 0,
+                active: true
+            };
+            state.students.push(newStudent);
+            DOM.studentName.value = '';
+            renderStudents();
+            renderStudentsSummary();
+            renderTrainingActions();
+            saveToLocalStorage();
+        } else {
+            alert('Por favor, digite o nome do aluno.');
+        }
+    }
+
+    function deleteStudent(event) {
+        const studentId = parseInt(event.currentTarget.getAttribute('data-student-id'));
+        if (confirm('Tem certeza que deseja excluir este aluno?')) {
+            state.students = state.students.filter(s => s.id !== studentId);
+            renderStudents();
+            renderStudentsSummary();
+            renderTrainingTypes();
+            renderTrainingActions();
+            saveToLocalStorage();
+        }
+    }
+
+    function toggleStudentActiveStatus(event) {
+        const studentId = parseInt(event.currentTarget.getAttribute('data-student-id'));
+        const student = state.students.find(s => s.id === studentId);
+        if (student) {
+            student.active = event.currentTarget.checked;
+            renderStudents();
+            renderStudentsSummary();
+            renderTrainingTypes();
+            renderTrainingActions();
+            saveToLocalStorage();
+        }
+    }
+    function addTraining() {
+        const name = DOM.trainingName.value.trim();
+        const kcal = parseInt(DOM.trainingKcal.value);
+
+        if (state.trainings.some(t => t.name.toLowerCase() === name.toLowerCase())) {
+            alert('Este treino já existe.');
+            return;
+        }
+
+        if (name && !isNaN(kcal) && kcal >= 0) {
+            const isRest = name.toLowerCase() === 'descanso';
+            const newTraining = {
+                id: `custom-${Date.now()}`,
+                name: name,
+                kcalPerMin: isRest ? 0 : kcal,
+                fatigueIncrease: isRest ? 0 : kcal * 0.8, // Fadiga proporcional às kcal
+                fatigueRecovery: isRest ? -20 : 0,
+                active: true
+            };
+            state.trainings.push(newTraining);
+            DOM.trainingName.value = '';
+            DOM.trainingKcal.value = '0';
+            renderTrainings();
+            renderTrainingTypes();
+            renderTrainingActions();
+            saveToLocalStorage();
+        } else {
+            alert('Por favor, digite um nome de treino e um valor de Kcal válidos.');
+        }
+    }
+
+    function deleteTraining(event) {
+        const trainingId = event.currentTarget.getAttribute('data-training-id');
+        const training = state.trainings.find(t => t.id === trainingId);
+        const defaultTrainingIds = ['soco', 'chute', 'descanso'];
+
+        if (!training) return;
+        if (defaultTrainingIds.includes(training.id)) {
+            alert('Os treinos padrão (Soco, Chute, Descanso) não podem ser excluídos.');
+            return;
+        }
+        
+        if (confirm(`Tem certeza que deseja excluir o treino "${training.name}"?`)) {
+            state.trainings = state.trainings.filter(t => t.id !== trainingId);
+            state.students.forEach(student => {
+                if (student.currentTraining === training.name) {
+                    student.currentTraining = 'Nenhum';
+                }
+            });
+            renderTrainings();
+            renderTrainingTypes();
+            renderTrainingActions();
+            renderStudents();
+            renderStudentsSummary();
+            saveToLocalStorage();
+        }
+    }
+
+    function toggleTrainingActiveStatus(event) {
+        const trainingId = event.currentTarget.getAttribute('data-training-id');
+        const training = state.trainings.find(t => t.id === trainingId);
+        if (training) {
+            training.active = event.currentTarget.checked;
+            if (!training.active) {
+                state.students.filter(s => s.active).forEach(student => {
+                    if (student.currentTraining === training.name) {
+                        student.currentTraining = 'Nenhum';
+                    }
+                });
+            }
+            renderTrainings();
+            renderTrainingTypes();
+            renderTrainingActions();
+            renderStudentsSummary();
+            renderStudents();
+            saveToLocalStorage();
+        }
+    }
+
+    function rotateTraining() {
+        const activeStudents = state.students.filter(s => s.active);
+        const activeTrainings = state.trainings.filter(t => t.active && t.id !== 'descanso');
+
+        if (activeStudents.length === 0 || activeTrainings.length === 0) {
+            alert(activeStudents.length === 0 ? 
+                'Não há alunos ativos para revezar treinos.' : 
+                'Não há treinos ativos para revezar.');
+            return;
+        }
+
+        activeStudents.forEach((student) => {
+            const currentIndex = activeTrainings.findIndex(t => t.name === student.currentTraining);
+            const nextIndex = (currentIndex + 1) % activeTrainings.length;
+            student.currentTraining = activeTrainings[nextIndex].name;
+        });
+
+        renderStudents();
+        renderStudentsSummary();
+        renderTrainingTypes();
+        saveToLocalStorage();
+        alert('Treinos revezados para alunos ativos!');
+    }
+
+    function restAllStudents() {
+        const restTraining = state.trainings.find(t => t.id === 'descanso');
+        if (!restTraining) {
+            alert('O treino de descanso não está disponível.');
+            return;
+        }
+
+        state.students.filter(s => s.active).forEach(student => {
+            student.currentTraining = 'Descanso';
+        });
+
+        renderStudents();
+        renderStudentsSummary();
+        renderTrainingTypes();
+        saveToLocalStorage();
+        alert('Todos os alunos ativos foram colocados em descanso!');
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+
+        document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.action-btn[data-tab="${tabId}"]`).classList.add('active');
+
+        state.currentTab = tabId;
+        saveToLocalStorage();
+    }
+
+    // Inicialização
+    function init() {
+        loadFromLocalStorage();
+        if (!state.timeLeft) {
+            state.timeLeft = parseInt(DOM.trainingDuration.value) * 60;
+            state.initialDuration = state.timeLeft;
+        }
+        
+        // Configura event listeners
+        DOM.startTimerBtn.addEventListener('click', startTimer);
+        DOM.pauseTimerBtn.addEventListener('click', pauseTimer);
+        DOM.resetTimerBtn.addEventListener('click', resetTimer);
+        DOM.trainingDuration.addEventListener('change', updateTrainingDuration);
+        DOM.addStudentBtn.addEventListener('click', addStudent);
+        DOM.addTrainingBtn.addEventListener('click', addTraining);
+        DOM.autoRotateTrainingBtn.addEventListener('click', rotateTraining);
+        DOM.restAllBtn.addEventListener('click', restAllStudents);
+        
+        DOM.tabLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab(e.currentTarget.getAttribute('data-tab'));
+            });
+        });
+
+        // Verifica se há um timer em andamento
+        checkRunningTimer();
+        renderAll();
+    }
+
+    // Eventos
+    window.addEventListener('load', init);
+    window.addEventListener('beforeunload', saveToLocalStorage);
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && state.isRunning) {
+            checkRunningTimer();
+        }
+    });
+    
+    </script>
+</body>
+</html>
